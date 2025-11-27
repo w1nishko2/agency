@@ -1,0 +1,224 @@
+/**
+ * Стили для заглушек функций - Этап 2 (Верстка)
+ */
+
+/* Уведомление о заглушке */
+.stub-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 420px;
+    animation: stubSlideIn 0.3s ease-out;
+}
+
+@keyframes stubSlideIn {
+    from {
+        transform: translateX(500px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.stub-notification-fade-out {
+    animation: stubFadeOut 0.3s ease-out forwards;
+}
+
+@keyframes stubFadeOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(500px);
+        opacity: 0;
+    }
+}
+
+.stub-notification-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    position: relative;
+}
+
+.stub-notification-icon {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    animation: stubIconPulse 2s ease-in-out infinite;
+}
+
+@keyframes stubIconPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.stub-notification-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.stub-notification-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 5px;
+    letter-spacing: 0.3px;
+}
+
+.stub-notification-message {
+    font-size: 14px;
+    opacity: 0.95;
+    line-height: 1.5;
+}
+
+.stub-notification-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 12px;
+}
+
+.stub-notification-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+/* Варианты цветов */
+.stub-info .stub-notification-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stub-warning .stub-notification-content {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.stub-success .stub-notification-content {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* Адаптивность */
+@media (max-width: 576px) {
+    .stub-notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .stub-notification-content {
+        padding: 15px;
+    }
+    
+    .stub-notification-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .stub-notification-title {
+        font-size: 14px;
+    }
+    
+    .stub-notification-message {
+        font-size: 13px;
+    }
+}
+
+/* Индикатор демо-режима в углу (опционально) */
+.stub-demo-badge {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 9998;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: stubBadgePulse 3s ease-in-out infinite;
+}
+
+@keyframes stubBadgePulse {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(102, 126, 234, 0.6);
+    }
+}
+
+.stub-demo-badge i {
+    margin-right: 5px;
+}
+
+@media (max-width: 576px) {
+    .stub-demo-badge {
+        bottom: 10px;
+        left: 10px;
+        font-size: 11px;
+        padding: 6px 12px;
+    }
+}
+
+/* Стили для disabled элементов с подсказкой */
+.stub-disabled {
+    position: relative;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.stub-disabled::after {
+    content: attr(data-stub-message);
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 1000;
+}
+
+.stub-disabled:hover::after {
+    opacity: 1;
+}
