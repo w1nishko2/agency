@@ -283,12 +283,14 @@
                 
                 <!-- Результаты -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <p class="text-muted mb-0">Найдено: <strong>{{ $models->total() }}</strong> {{ $models->total() == 1 ? 'модель' : ($models->total() < 5 ? 'модели' : 'моделей') }}</p>
-                    <select class="form-select w-auto" name="sort" onchange="this.form.submit()">
-                        <option value="new" {{ request('sort') == 'new' ? 'selected' : '' }}>Новые</option>
-                        <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Популярные</option>
-                        <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>По имени</option>
-                    </select>
+                    <p class="text-muted mb-0">Найдено: <strong id="total-count">{{ $models->total() }}</strong> <span id="model-word">{{ $models->total() == 1 ? 'модель' : ($models->total() < 5 ? 'модели' : 'моделей') }}</span></p>
+                    <form id="sort-form" class="d-inline">
+                        <select class="form-select w-auto" name="sort" id="sort-select">
+                            <option value="new" {{ request('sort') == 'new' ? 'selected' : '' }}>Новые</option>
+                            <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Популярные</option>
+                            <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>По имени</option>
+                        </select>
+                    </form>
                 </div>
 
                 <!-- Карточки моделей -->
@@ -552,6 +554,11 @@
             const grid = document.getElementById('models-grid');
             grid.innerHTML = '';
 
+            // Обновляем счетчик
+            const totalCount = data.total || 0;
+            document.getElementById('total-count').textContent = totalCount;
+            document.getElementById('model-word').textContent = getModelWord(totalCount);
+
             // Добавляем новые карточки
             if (data.models && data.models.length > 0) {
                 data.models.forEach(model => {
@@ -570,8 +577,15 @@
         });
     }
 
+    // Склонение слова "модель/модели/моделей"
+    function getModelWord(count) {
+        if (count === 1) return 'модель';
+        if (count >= 2 && count <= 4) return 'модели';
+        return 'моделей';
+    }
+
     // Сортировка
-    document.querySelector('select[name="sort"]').addEventListener('change', function() {
+    document.getElementById('sort-select').addEventListener('change', function() {
         filters.sort = this.value;
         resetModels();
     });

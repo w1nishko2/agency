@@ -10,7 +10,7 @@
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Заявки на кастинг</h2>
+    <h2 class="mb-0">Заявки на кастинг и подбор моделей</h2>
 </div>
 
 <!-- Фильтры -->
@@ -71,10 +71,25 @@
                     <tr>
                         <td>
                             <div class="fw-semibold">{{ $app->full_name }}</div>
-                            <small class="text-muted">{{ $app->gender == 'male' ? 'М' : 'Ж' }}, {{ $app->age }} лет, {{ $app->city }}</small>
+                            <small class="text-muted">
+                                @if(str_contains($app->last_name, 'Заявка на подбор'))
+                                    <span class="badge badge-sm bg-primary">
+                                        <i class="bi bi-search"></i> Подбор модели
+                                    </span>
+                                @else
+                                    {{ $app->gender == 'male' ? 'М' : ($app->gender == 'female' ? 'Ж' : 'Любой') }}
+                                    @if($app->age > 0), {{ $app->age }} лет @endif
+                                    @if($app->city != '-'), {{ $app->city }} @endif
+                                @endif
+                            </small>
                         </td>
                         <td>
-                            <span class="fw-semibold">{{ $app->height }} см</span> / {{ $app->weight }} кг
+                            @if($app->height > 0)
+                                <span class="fw-semibold">{{ $app->height }} см</span>
+                                @if($app->weight > 0) / {{ $app->weight }} кг @endif
+                            @else
+                                <span class="text-muted">—</span>
+                            @endif
                         </td>
                         <td>
                             <div><i class="bi bi-phone me-1"></i>{{ $app->phone }}</div>
@@ -82,12 +97,14 @@
                         </td>
                         <td><small class="text-muted">{{ $app->created_at->format('d.m.Y H:i') }}</small></td>
                         <td>
-                            @if($app->status === 'new')
+                            @if($app->status === 'new' || $app->status === 'review')
                                 <span class="badge bg-warning text-dark">Новая</span>
                             @elseif($app->status === 'approved')
                                 <span class="badge bg-success">Одобрена</span>
                             @elseif($app->status === 'rejected')
                                 <span class="badge bg-danger">Отклонена</span>
+                            @elseif($app->status === 'contacted')
+                                <span class="badge bg-primary">Связались</span>
                             @endif
                         </td>
                         <td>
@@ -96,7 +113,7 @@
                                     <i class="bi bi-eye"></i>
                                 </a>
                                 
-                                @if($app->status === 'new')
+                                @if($app->status === 'new' || $app->status === 'review')
                                     <form action="{{ route('admin.castings.approve', $app->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('PATCH')

@@ -10,7 +10,9 @@ class BookingController extends Controller
 {
     public function store(Request $request, $modelId)
     {
-        $model = ModelProfile::active()->findOrFail($modelId);
+        // Валидация ID модели
+        $validated_id = validator(['id' => $modelId], ['id' => 'required|integer|min:1'])->validate();
+        $model = ModelProfile::active()->findOrFail($validated_id['id']);
 
         $validated = $request->validate([
             'client_name' => 'required|string|max:255',
@@ -27,11 +29,25 @@ class BookingController extends Controller
             'message' => 'nullable|string',
         ]);
 
-        $validated['model_id'] = $modelId;
+        $validated['model_id'] = $validated_id['id'];
+        
+        // Санитизация текстовых полей
+        if (!empty($validated['client_name'])) {
+            $validated['client_name'] = strip_tags($validated['client_name']);
+        }
+        if (!empty($validated['company_name'])) {
+            $validated['company_name'] = strip_tags($validated['company_name']);
+        }
+        if (!empty($validated['event_description'])) {
+            $validated['event_description'] = strip_tags($validated['event_description']);
+        }
+        if (!empty($validated['event_location'])) {
+            $validated['event_location'] = strip_tags($validated['event_location']);
+        }
         
         // Объединяем message в event_description если есть
         if (!empty($validated['message'])) {
-            $validated['event_description'] = $validated['message'];
+            $validated['event_description'] = strip_tags($validated['message']);
             unset($validated['message']);
         }
 

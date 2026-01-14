@@ -71,9 +71,9 @@
                 <tr>
                     <td>{{ $post->id }}</td>
                     <td>
-                        @if($post->featured_image)
+                        @if($post->featured_image && Storage::disk('public')->exists($post->featured_image))
                             <img src="{{ asset('storage/' . $post->featured_image) }}" 
-                                 alt="{{ $post->title }}" 
+                                 alt="{{ e($post->title) }}" 
                                  class="img-thumbnail"
                                  style="width: 60px; height: 60px; object-fit: cover;">
                         @else
@@ -135,8 +135,8 @@
                             </a>
                             <form action="{{ route('admin.blog.destroy', $post->id) }}" 
                                   method="POST" 
-                                  class="d-inline"
-                                  onsubmit="return confirm('Удалить статью?')">
+                                  class="delete-form d-inline"
+                                  data-confirm="Удалить статью?">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" 

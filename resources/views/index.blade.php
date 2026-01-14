@@ -240,9 +240,9 @@
 <!-- CTA Section -->
 <section class="py-5 bg-dark text-white">
     <div class="container text-center">
-        <h2 class="mb-4">Готовы начать карьеру модели?</h2>
-        <p class="lead mb-4">Пройдите кастинг и станьте частью нашего агентства</p>
-        <a href="{{ route('casting.index') }}" class="btn btn-outline-light btn-lg">Пройти кастинг</a>
+        <h2 class="mb-4">Ищете модель для проекта?</h2>
+        <p class="lead mb-4">Заполните заявку и мы подберем идеальную модель по вашим критериям</p>
+        <a href="{{ route('casting.index') }}" class="btn btn-outline-light btn-lg">Подобрать модель</a>
     </div>
 </section>
 
@@ -347,9 +347,6 @@
                     </div>
                     
                     <div class="social-links d-flex gap-3">
-                        <a href="https://instagram.com/goldenmodels" target="_blank" class="text-dark fs-4">
-                            <i class="bi bi-instagram"></i>
-                        </a>
                         <a href="https://vk.com/goldenmodels" target="_blank" class="text-dark fs-4">
                             <i class="bi bi-globe"></i>
                         </a>

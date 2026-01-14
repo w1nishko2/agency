@@ -37,7 +37,6 @@ class ModelProfile extends Model
         'bio',
         'languages',
         'skills',
-        'instagram',
         'telegram',
         'vk',
         'facebook',

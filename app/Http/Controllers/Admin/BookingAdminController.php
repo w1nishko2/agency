@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class BookingAdminController extends Controller
 {
@@ -26,9 +29,12 @@ class BookingAdminController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Поиск
+        // Поиск с экранированием спецсимволов LIKE
         if ($request->filled('search')) {
-            $search = $request->search;
+            $request->validate([
+                'search' => 'string|max:100'
+            ]);
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
             $query->where(function($q) use ($search) {
                 $q->where('client_name', 'like', "%{$search}%")
                   ->orWhere('client_email', 'like', "%{$search}%")
@@ -47,7 +53,8 @@ class BookingAdminController extends Controller
      */
     public function show($id)
     {
-        $booking = Booking::with(['model.user'])->findOrFail($id);
+        $validated = validator(['id' => $id], ['id' => 'required|integer|min:1'])->validate();
+        $booking = Booking::with(['model.user'])->findOrFail($validated['id']);
         return view('admin.bookings.show', compact('booking'));
     }
 
@@ -56,8 +63,20 @@ class BookingAdminController extends Controller
      */
     public function approve($id)
     {
-        $booking = Booking::findOrFail($id);
-        $booking->update(['status' => 'confirmed']);
+        $validated = validator(['id' => $id], ['id' => 'required|integer|min:1'])->validate();
+        $booking = Booking::findOrFail($validated['id']);
+        
+        DB::transaction(function() use ($booking) {
+            $booking->update(['status' => 'confirmed']);
+        });
+
+        Log::info('Booking approved', [
+            'booking_id' => $booking->id,
+            'client_name' => $booking->client_name,
+            'model_id' => $booking->model_id,
+            'admin_id' => auth()->id(),
+            'admin_name' => auth()->user()->name
+        ]);
 
         return back()->with('success', 'Бронирование одобрено!');
     }
@@ -67,10 +86,28 @@ class BookingAdminController extends Controller
      */
     public function reject(Request $request, $id)
     {
-        $booking = Booking::findOrFail($id);
-        $booking->update([
-            'status' => 'cancelled',
-            'rejection_reason' => $request->input('reason', 'Не указана')
+        $validated_id = validator(['id' => $id], ['id' => 'required|integer|min:1'])->validate();
+        $booking = Booking::findOrFail($validated_id['id']);
+        
+        $request->validate([
+            'reason' => 'required|string|max:500'
+        ]);
+        
+        $reason = strip_tags($request->input('reason'));
+        
+        DB::transaction(function() use ($booking, $reason) {
+            $booking->update([
+                'status' => 'cancelled',
+                'cancellation_reason' => $reason
+            ]);
+        });
+
+        Log::info('Booking rejected', [
+            'booking_id' => $booking->id,
+            'client_name' => $booking->client_name,
+            'reason' => $reason,
+            'admin_id' => auth()->id(),
+            'admin_name' => auth()->user()->name
         ]);
 
         return back()->with('success', 'Бронирование отклонено.');
@@ -81,8 +118,24 @@ class BookingAdminController extends Controller
      */
     public function complete($id)
     {
-        $booking = Booking::findOrFail($id);
-        $booking->update(['status' => 'completed']);
+        $validated = validator(['id' => $id], ['id' => 'required|integer|min:1'])->validate();
+        $booking = Booking::findOrFail($validated['id']);
+        
+        DB::transaction(function() use ($booking) {
+            $booking->update(['status' => 'completed']);
+            // Увеличиваем счетчик успешных бронирований модели
+            if ($booking->model) {
+                $booking->model->increment('bookings_count');
+            }
+        });
+
+        Log::info('Booking completed', [
+            'booking_id' => $booking->id,
+            'client_name' => $booking->client_name,
+            'model_id' => $booking->model_id,
+            'admin_id' => auth()->id(),
+            'admin_name' => auth()->user()->name
+        ]);
 
         return back()->with('success', 'Бронирование отмечено как выполненное.');
     }
@@ -92,8 +145,24 @@ class BookingAdminController extends Controller
      */
     public function destroy($id)
     {
-        $booking = Booking::findOrFail($id);
-        $booking->delete();
+        $validated = validator(['id' => $id], ['id' => 'required|integer|min:1'])->validate();
+        $booking = Booking::findOrFail($validated['id']);
+        
+        $bookingData = [
+            'id' => $booking->id,
+            'client_name' => $booking->client_name,
+            'model_id' => $booking->model_id,
+            'status' => $booking->status
+        ];
+        
+        DB::transaction(function() use ($booking) {
+            $booking->delete();
+        });
+
+        Log::warning('Booking deleted', array_merge($bookingData, [
+            'admin_id' => auth()->id(),
+            'admin_name' => auth()->user()->name
+        ]));
 
         return redirect()->route('admin.bookings.index')->with('success', 'Бронирование удалено.');
     }

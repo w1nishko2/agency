@@ -10,9 +10,6 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
-    <!-- Stub Functions CSS (Этап 2) -->
-    <link rel="stylesheet" href="{{ asset('css/stub-functions.css') }}">
-    
     <style>
         :root {
             --sidebar-width: 260px;
@@ -317,24 +314,24 @@
             <a href="{{ route('admin.models.index') }}" class="sidebar-link {{ request()->routeIs('admin.models.*') ? 'active' : '' }}">
                 <i class="bi bi-people"></i>
                 <span>Модели</span>
-                @if(\App\Models\ModelProfile::where('status', 'pending')->count() > 0)
-                    <span class="badge bg-warning text-dark">{{ \App\Models\ModelProfile::where('status', 'pending')->count() }}</span>
+                @if($sidebar_stats['pending_models_count'] > 0)
+                    <span class="badge bg-warning text-dark">{{ $sidebar_stats['pending_models_count'] }}</span>
                 @endif
             </a>
             
             <a href="{{ route('admin.castings.index') }}" class="sidebar-link {{ request()->routeIs('admin.castings.*') ? 'active' : '' }}">
                 <i class="bi bi-camera-video"></i>
                 <span>Кастинги</span>
-                @if(\App\Models\CastingApplication::where('status', 'new')->count() > 0)
-                    <span class="badge bg-warning text-dark">{{ \App\Models\CastingApplication::where('status', 'new')->count() }}</span>
+                @if($sidebar_stats['new_castings_count'] > 0)
+                    <span class="badge bg-warning text-dark">{{ $sidebar_stats['new_castings_count'] }}</span>
                 @endif
             </a>
             
             <a href="{{ route('admin.bookings.index') }}" class="sidebar-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
                 <i class="bi bi-calendar-check"></i>
                 <span>Бронирования</span>
-                @if(\App\Models\Booking::where('status', 'pending')->count() > 0)
-                    <span class="badge bg-info">{{ \App\Models\Booking::where('status', 'pending')->count() }}</span>
+                @if($sidebar_stats['pending_bookings_count'] > 0)
+                    <span class="badge bg-info">{{ $sidebar_stats['pending_bookings_count'] }}</span>
                 @endif
             </a>
             
@@ -424,14 +421,19 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Stub Functions Script (Этап 2) -->
-    <script src="{{ asset('js/stub-functions.js') }}"></script>
-    
-    <!-- Demo Badge для админки -->
-    <div class="stub-demo-badge">
-        <i class="bi bi-tools"></i>
-        Админка: Демо (Этап 2)
-    </div>
+    <script>
+        // Подтверждение удаления без inline JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.delete-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const message = this.dataset.confirm || 'Вы уверены?';
+                    if (!confirm(message)) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
     
     @stack('scripts')
 </body>

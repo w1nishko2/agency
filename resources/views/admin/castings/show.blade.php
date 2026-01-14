@@ -17,17 +17,71 @@
         <p class="text-muted mb-0">
             <small>ID: {{ $application->id }} | Подана: {{ $application->created_at->format('d.m.Y H:i') }}</small>
         </p>
+        @if(str_contains($application->last_name, 'Заявка на подбор'))
+            <span class="badge bg-primary mt-2">
+                <i class="bi bi-search me-1"></i>Запрос на подбор модели
+            </span>
+        @endif
     </div>
     <div>
-        @if($application->status == 'new')
+        @if($application->status == 'new' || $application->status == 'review')
             <span class="badge bg-info fs-6">Новая</span>
         @elseif($application->status == 'approved')
             <span class="badge bg-success fs-6">Одобрена</span>
-        @else
+        @elseif($application->status == 'rejected')
             <span class="badge bg-danger fs-6">Отклонена</span>
+        @elseif($application->status == 'contacted')
+            <span class="badge bg-primary fs-6">Связались</span>
         @endif
     </div>
 </div>
+
+<!-- Выбранные модели -->
+@if($application->selected_models)
+<div class="content-card mb-4">
+    <div class="content-card-header">
+        <h5 class="mb-0">
+            <i class="bi bi-check-circle me-2 text-success"></i>Выбранные модели для кастинга
+            <span class="badge bg-success ms-2">{{ count(json_decode($application->selected_models)) }}</span>
+        </h5>
+    </div>
+    <div class="content-card-body">
+        <div class="row g-3">
+            @foreach(json_decode($application->selected_models) as $selectedModel)
+            <div class="col-md-4">
+                <div class="card position-relative">
+                    <!-- Кнопка удаления -->
+                    <form action="{{ route('admin.castings.remove-model', [$application->id, $selectedModel->id]) }}" 
+                          method="POST" 
+                          class="delete-form position-absolute top-0 end-0 m-2"
+                          data-confirm="Удалить модель {{ e($selectedModel->name) }} из кастинга?">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-danger" style="padding: 0.25rem 0.5rem;">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </form>
+                    
+                    <div class="card-body">
+                        <h6 class="card-title mb-2 pe-4">{{ e($selectedModel->name) }}</h6>
+                        <div class="small text-muted">
+                            <div><i class="bi bi-person me-1"></i>{{ $selectedModel->age }} лет</div>
+                            <div><i class="bi bi-rulers me-1"></i>{{ $selectedModel->height }} см</div>
+                            <div class="text-success mt-2">
+                                <i class="bi bi-clock me-1"></i>{{ \Carbon\Carbon::parse($selectedModel->selected_at)->format('d.m.Y H:i') }}
+                            </div>
+                        </div>
+                        <a href="{{ route('admin.models.detail', $selectedModel->id) }}" class="btn btn-sm btn-outline-primary mt-2 w-100">
+                            <i class="bi bi-eye me-1"></i>Просмотр
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+@endif
 
 <!-- Панель действий -->
 <div class="content-card mb-4">
@@ -37,7 +91,11 @@
                 <i class="bi bi-arrow-left me-1"></i>К списку
             </a>
             
-            @if($application->status == 'new')
+            <a href="{{ route('admin.castings.find-models', $application->id) }}" class="btn btn-primary">
+                <i class="bi bi-search me-1"></i>Подбор моделей по критериям
+            </a>
+            
+            @if($application->status == 'new' || $application->status == 'review')
                 <form action="{{ route('admin.castings.approve', $application->id) }}" method="POST" class="d-inline">
                     @csrf
                     @method('PATCH')
@@ -51,7 +109,8 @@
             @endif
 
             <form action="{{ route('admin.castings.destroy', $application->id) }}" method="POST" 
-                  onsubmit="return confirm('Удалить заявку безвозвратно?')" class="ms-auto">
+                  class="delete-form ms-auto"
+                  data-confirm="Удалить заявку безвозвратно?">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-outline-danger">
@@ -70,7 +129,7 @@
                 <h5 class="mb-0"><i class="bi bi-images me-2"></i>Фотографии</h5>
             </div>
             <div class="content-card-body">
-                                @if($application->photo_portrait)
+                                @if($application->photo_portrait && Storage::disk('public')->exists($application->photo_portrait))
                                     <div class="mb-3">
                                         <img src="{{ asset('storage/' . $application->photo_portrait) }}" 
                                              class="img-fluid rounded" alt="Портрет">
@@ -78,7 +137,7 @@
                                     </div>
                                 @endif
 
-                                @if($application->photo_full_body)
+                                @if($application->photo_full_body && Storage::disk('public')->exists($application->photo_full_body))
                                     <div class="mb-3">
                                         <img src="{{ asset('storage/' . $application->photo_full_body) }}" 
                                              class="img-fluid rounded" alt="В полный рост">
@@ -86,7 +145,7 @@
                                     </div>
                                 @endif
 
-                                @if($application->photo_profile)
+                                @if($application->photo_profile && Storage::disk('public')->exists($application->photo_profile))
                                     <div class="mb-3">
                                         <img src="{{ asset('storage/' . $application->photo_profile) }}" 
                                              class="img-fluid rounded" alt="Профиль">
@@ -94,16 +153,17 @@
                                     </div>
                                 @endif
 
-                                @if($application->photo_additional_1 || $application->photo_additional_2)
+                                @if(($application->photo_additional_1 && Storage::disk('public')->exists($application->photo_additional_1)) || 
+                                    ($application->photo_additional_2 && Storage::disk('public')->exists($application->photo_additional_2)))
                                     <h6 class="mt-4 mb-3">Дополнительные фото</h6>
                                     <div class="row g-2">
-                                        @if($application->photo_additional_1)
+                                        @if($application->photo_additional_1 && Storage::disk('public')->exists($application->photo_additional_1))
                                             <div class="col-6">
                                                 <img src="{{ asset('storage/' . $application->photo_additional_1) }}" 
                                                      class="img-fluid rounded" alt="Доп. фото 1">
                                             </div>
                                         @endif
-                                        @if($application->photo_additional_2)
+                                        @if($application->photo_additional_2 && Storage::disk('public')->exists($application->photo_additional_2))
                                             <div class="col-6">
                                                 <img src="{{ asset('storage/' . $application->photo_additional_2) }}" 
                                                      class="img-fluid rounded" alt="Доп. фото 2">
@@ -175,15 +235,6 @@
                                         <p class="mb-0">
                                             <i class="bi bi-telegram me-2"></i>
                                             {{ $application->telegram }}
-                                        </p>
-                                    </div>
-                                    @endif
-                                    @if($application->instagram)
-                                    <div class="col-md-6">
-                                        <label class="text-muted small">Instagram</label>
-                                        <p class="mb-0">
-                                            <i class="bi bi-instagram me-2"></i>
-                                            {{ $application->instagram }}
                                         </p>
                                     </div>
                                     @endif

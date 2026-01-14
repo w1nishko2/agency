@@ -93,7 +93,7 @@
                                 <!-- Обложка -->
                                 <div class="mb-4">
                                     <label for="featured_image" class="form-label">Обложка статьи</label>
-                                    @if(isset($post) && $post->featured_image)
+                                    @if(isset($post) && $post->featured_image && Storage::disk('public')->exists($post->featured_image))
                                         <div class="mb-3">
                                             <img src="{{ asset('storage/' . $post->featured_image) }}" 
                                                  alt="Текущая обложка" 
@@ -115,12 +115,14 @@
                                     @if(isset($post) && $post->gallery_images && count($post->gallery_images) > 0)
                                         <div class="row g-2 mb-3">
                                             @foreach($post->gallery_images as $image)
-                                                <div class="col-auto">
-                                                    <img src="{{ asset('storage/' . $image) }}" 
-                                                         alt="Галерея" 
-                                                         class="img-thumbnail"
-                                                         style="width: 100px; height: 100px; object-fit: cover;">
-                                                </div>
+                                                @if(Storage::disk('public')->exists($image))
+                                                    <div class="col-auto">
+                                                        <img src="{{ asset('storage/' . $image) }}" 
+                                                             alt="Галерея" 
+                                                             class="img-thumbnail"
+                                                             style="width: 100px; height: 100px; object-fit: cover;">
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </div>
                                     @endif

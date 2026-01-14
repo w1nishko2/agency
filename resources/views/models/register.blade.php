@@ -206,10 +206,6 @@
 
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
-                                    <label for="instagram" class="form-label">Instagram</label>
-                                    <input type="text" class="form-control" id="instagram" name="instagram" value="{{ old('instagram') }}" placeholder="@username">
-                                </div>
-                                <div class="col-md-6">
                                     <label for="vk" class="form-label">VK</label>
                                     <input type="text" class="form-control" id="vk" name="vk" value="{{ old('vk') }}" placeholder="vk.com/username">
                                 </div>

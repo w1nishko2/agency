@@ -70,7 +70,7 @@
                 </div>
                 <div class="flex-grow-1">
                     <div class="text-muted small mb-1">Бронирований</div>
-                    <h3 class="mb-0">{{ \App\Models\Booking::count() }}</h3>
+                    <h3 class="mb-0">{{ $bookings_count }}</h3>
                 </div>
             </div>
         </div>
@@ -103,9 +103,14 @@
                     <tr>
                         <td>
                             <div class="d-flex align-items-center">
-                                @if($model->main_photo)
+                                @if($model->main_photo && \Storage::disk('public')->exists($model->main_photo))
                                     <img src="{{ asset('storage/' . $model->main_photo) }}" alt="{{ $model->full_name }}" 
-                                         class="rounded me-3" style="width: 45px; height: 60px; object-fit: cover;">
+                                         class="rounded me-3" style="width: 45px; height: 60px; object-fit: cover;"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center" 
+                                         style="width: 45px; height: 60px; display: none;">
+                                        <i class="bi bi-person text-white"></i>
+                                    </div>
                                 @else
                                     <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center" 
                                          style="width: 45px; height: 60px;">
@@ -134,7 +139,7 @@
                         </td>
                         <td><small class="text-muted">{{ $model->created_at->format('d.m.Y H:i') }}</small></td>
                         <td class="text-end">
-                            <a href="{{ route('admin.models.show', $model->id) }}" class="btn btn-sm btn-outline-primary">
+                            <a href="{{ route('admin.models.detail', $model->id) }}" class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-eye"></i>
                             </a>
                         </td>
@@ -158,16 +163,16 @@
     <li class="nav-item" role="presentation">
         <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#casting" type="button">
             <i class="bi bi-camera-video me-2"></i>Заявки на кастинг
-            @if(\App\Models\CastingApplication::where('status', 'new')->count() > 0)
-                <span class="badge bg-warning text-dark ms-2">{{ \App\Models\CastingApplication::where('status', 'new')->count() }}</span>
+            @if($new_castings_count > 0)
+                <span class="badge bg-warning text-dark ms-2">{{ $new_castings_count }}</span>
             @endif
         </button>
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#bookings" type="button">
             <i class="bi bi-calendar-check me-2"></i>Бронирования
-            @if(\App\Models\Booking::where('status', 'pending')->count() > 0)
-                <span class="badge bg-info ms-2">{{ \App\Models\Booking::where('status', 'pending')->count() }}</span>
+            @if($pending_bookings_count > 0)
+                <span class="badge bg-info ms-2">{{ $pending_bookings_count }}</span>
             @endif
         </button>
     </li>
@@ -199,7 +204,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse(\App\Models\CastingApplication::orderBy('created_at', 'desc')->take(10)->get() as $application)
+                            @forelse($recent_castings as $application)
                             <tr>
                                 <td>
                                     <div class="fw-semibold">{{ $application->full_name }}</div>
@@ -266,7 +271,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse(\App\Models\Booking::with('model')->orderBy('created_at', 'desc')->take(10)->get() as $booking)
+                            @forelse($recent_bookings as $booking)
                             <tr>
                                 <td>
                                     <div class="fw-semibold">{{ $booking->client_name }}</div>
@@ -274,7 +279,7 @@
                                 </td>
                                 <td>
                                     @if($booking->model)
-                                        <a href="{{ route('admin.models.show', $booking->model->id) }}" class="text-decoration-none">
+                                        <a href="{{ route('admin.models.detail', $booking->model->id) }}" class="text-decoration-none">
                                             {{ $booking->model->full_name }}
                                         </a>
                                     @else

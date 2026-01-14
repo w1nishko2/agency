@@ -78,7 +78,7 @@
                                 </td>
                                 <td>
                                     @if($booking->model)
-                                        <a href="{{ route('admin.models.show', $booking->model->id) }}" class="text-decoration-none">
+                                        <a href="{{ route('admin.models.detail', $booking->model->id) }}" class="text-decoration-none">
                                             {{ $booking->model->full_name }}
                                         </a>
                                     @else

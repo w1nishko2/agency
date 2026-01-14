@@ -60,7 +60,9 @@
                 </form>
             @endif
             
-            <form action="{{ route('admin.bookings.destroy', $booking->id) }}" method="POST" onsubmit="return confirm('Удалить бронирование безвозвратно?')" class="ms-auto">
+            <form action="{{ route('admin.bookings.destroy', $booking->id) }}" method="POST" 
+                  class="delete-form ms-auto"
+                  data-confirm="Удалить бронирование безвозвратно?">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-outline-danger">
@@ -120,7 +122,7 @@
                             <div class="content-card-body">
                                 @if($booking->model)
                                     <div class="d-flex align-items-center mb-3">
-                                        @if($booking->model->main_photo)
+                                        @if($booking->model->main_photo && Storage::disk('public')->exists($booking->model->main_photo))
                                             <img src="{{ asset('storage/' . $booking->model->main_photo) }}" 
                                                  alt="{{ $booking->model->full_name }}" 
                                                  class="rounded me-3" 
@@ -137,7 +139,7 @@
                                         </div>
                                     </div>
                                     <div class="d-grid gap-2">
-                                        <a href="{{ route('admin.models.show', $booking->model->id) }}" class="btn btn-outline-primary btn-sm">
+                                        <a href="{{ route('admin.models.detail', $booking->model->id) }}" class="btn btn-outline-primary btn-sm">
                                             <i class="bi bi-eye me-2"></i>Просмотреть профиль модели
                                         </a>
                                         <a href="{{ route('models.show', $booking->model->id) }}" class="btn btn-outline-secondary btn-sm" target="_blank">
@@ -207,7 +209,7 @@
                                     @if($booking->event_description)
                                         <div class="col-12">
                                             <label class="text-muted small">Описание</label>
-                                            <p class="mb-0">{{ $booking->event_description }}</p>
+                                            <p class="mb-0">{{ e($booking->event_description) }}</p>
                                         </div>
                                     @endif
                                 </div>
@@ -216,14 +218,14 @@
                     </div>
 
                     <!-- Причина отмены (если есть) -->
-                    @if($booking->status == 'cancelled' && $booking->rejection_reason)
+                    @if($booking->status == 'cancelled' && $booking->cancellation_reason)
                         <div class="col-12">
                             <div class="content-card border-danger">
                                 <div class="content-card-header bg-danger text-white">
                                     <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Причина отмены</h5>
                                 </div>
                                 <div class="content-card-body">
-                                    <p class="mb-0">{{ $booking->rejection_reason }}</p>
+                                    <p class="mb-0">{{ e($booking->cancellation_reason) }}</p>
                                 </div>
                             </div>
                         </div>

@@ -275,10 +275,6 @@
 
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
-                                <label class="form-label">Instagram</label>
-                                <input type="text" class="form-control" name="instagram" placeholder="@username" value="{{ $model->instagram }}">
-                            </div>
-                            <div class="col-md-6">
                                 <label class="form-label">Telegram</label>
                                 <input type="text" class="form-control" name="telegram" placeholder="@username" value="{{ $model->telegram }}">
                             </div>

@@ -9,6 +9,8 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Auth\YandexAuthController;
+use App\Http\Controllers\Auth\VkAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +31,7 @@ Route::get('/', function () {
 // Модели
 Route::get('/models', [ModelsController::class, 'index'])->name('models.index');
 Route::get('/model/{id}', [ModelsController::class, 'show'])->name('models.show');
-Route::post('/models/{id}/book', [BookingController::class, 'store'])->name('models.book');
+Route::post('/models/{id}/book', [BookingController::class, 'store'])->name('models.book')->middleware('throttle:5,1');
 
 // Регистрация моделью
 Route::get('/register-model', [ModelsController::class, 'registerForm'])->name('models.register');
@@ -59,6 +61,14 @@ Route::post('/contact', [ContactController::class, 'submit'])->name('contact.sub
 // Авторизация
 Auth::routes();
 
+// Yandex OAuth
+Route::get('/auth/yandex', [YandexAuthController::class, 'redirectToYandex'])->name('auth.yandex');
+Route::get('/auth/yandex/callback', [YandexAuthController::class, 'handleYandexCallback'])->name('auth.yandex.callback');
+
+// VK OAuth
+Route::get('/auth/vk', [VkAuthController::class, 'redirectToVk'])->name('auth.vk');
+Route::get('/auth/vk/callback', [VkAuthController::class, 'handleVkCallback'])->name('auth.vk.callback');
+
 // Профиль модели (защищенные маршруты)
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
@@ -69,19 +79,11 @@ Route::middleware(['auth'])->group(function () {
 
 // Админка
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        $stats = [
-            'pending_models' => \App\Models\ModelProfile::where('status', 'pending')->count(),
-            'active_models' => \App\Models\ModelProfile::where('status', 'active')->count(),
-            'total_models' => \App\Models\ModelProfile::count(),
-            'recent_models' => \App\Models\ModelProfile::latest()->limit(5)->get(),
-        ];
-        return view('admin.dashboard', $stats);
-    })->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
     // Модерация моделей
     Route::get('/models', [\App\Http\Controllers\Admin\ModelAdminController::class, 'index'])->name('models.index');
-    Route::get('/models/{id}', [\App\Http\Controllers\Admin\ModelAdminController::class, 'show'])->name('models.show');
+    Route::get('/models/{id}', [\App\Http\Controllers\Admin\ModelAdminController::class, 'show'])->name('models.detail');
     Route::patch('/models/{id}/approve', [\App\Http\Controllers\Admin\ModelAdminController::class, 'approve'])->name('models.approve');
     Route::patch('/models/{id}/reject', [\App\Http\Controllers\Admin\ModelAdminController::class, 'reject'])->name('models.reject');
     Route::patch('/models/{id}/deactivate', [\App\Http\Controllers\Admin\ModelAdminController::class, 'deactivate'])->name('models.deactivate');
@@ -92,6 +94,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Кастинги
     Route::get('/castings', [\App\Http\Controllers\Admin\CastingAdminController::class, 'index'])->name('castings.index');
     Route::get('/castings/{id}', [\App\Http\Controllers\Admin\CastingAdminController::class, 'show'])->name('castings.show');
+    Route::get('/castings/{id}/find-models', [\App\Http\Controllers\Admin\CastingAdminController::class, 'findModels'])->name('castings.find-models');
+    Route::post('/castings/{id}/assign-models', [\App\Http\Controllers\Admin\CastingAdminController::class, 'assignModels'])->name('castings.assign-models');
+    Route::delete('/castings/{castingId}/models/{modelId}', [\App\Http\Controllers\Admin\CastingAdminController::class, 'removeModel'])->name('castings.remove-model');
     Route::patch('/castings/{id}/approve', [\App\Http\Controllers\Admin\CastingAdminController::class, 'approve'])->name('castings.approve');
     Route::patch('/castings/{id}/reject', [\App\Http\Controllers\Admin\CastingAdminController::class, 'reject'])->name('castings.reject');
     Route::delete('/castings/{id}', [\App\Http\Controllers\Admin\CastingAdminController::class, 'destroy'])->name('castings.destroy');

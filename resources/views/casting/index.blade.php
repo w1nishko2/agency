@@ -1,23 +1,42 @@
 @extends('layouts.main')
 
-@section('title', 'Кастинг моделей - Golden Models')
-@section('description', 'Станьте моделью агентства Golden Models. Пройдите онлайн-кастинг и начните карьеру в модельном бизнесе.')
+@section('title', 'Подбор моделей - Golden Models')
+@section('description', 'Подберите модель по вашим критериям. Заполните анкету и наши менеджеры подберут идеальных кандидатов для вашего проекта.')
 
 @section('content')
 
 <!-- Hero блок -->
 <section class="py-5" style="background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('{{ asset('imgsite/photo_6_2025-11-27_12-56-07.webp') }}') center/cover;">
     <div class="container text-center">
-        <h1 class="mb-3">КАСТИНГ МОДЕЛЕЙ</h1>
-        <p class="lead text-muted">Заполните анкету и станьте частью нашего агентства</p>
+        <h1 class="mb-3">ПОДБОР МОДЕЛЕЙ</h1>
+        <p class="lead text-muted">Укажите критерии и мы подберем идеальную модель для вашего проекта</p>
     </div>
 </section>
 
-<!-- Форма кастинга -->
+<!-- Форма подбора моделей -->
 <section class="py-5">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
+                
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Ошибки при заполнении формы:</strong>
+                        <ul class="mb-0 mt-2">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
                 
                 <!-- Прогресс-бар -->
                 <div class="mb-5">
@@ -30,33 +49,56 @@
                     </div>
                 </div>
 
-                <form id="casting-form" action="{{ route('casting.submit') }}" method="POST" enctype="multipart/form-data">
+                <form id="casting-form" action="{{ route('casting.submit') }}" method="POST">
                     @csrf
                     
-                    <!-- Шаг 1: Пол -->
+                    <!-- Шаг 1: Тип проекта -->
                     <div class="form-step active" data-step="1">
-                        <h3 class="mb-4">Выберите пол</h3>
+                        <h3 class="mb-4">Для какого проекта нужна модель?</h3>
+                        <select class="form-select form-select-lg" name="project_type" required>
+                            <option value="">Выберите тип проекта</option>
+                            <option value="Фотосессия">Фотосессия</option>
+                            <option value="Видеосъемка">Видеосъемка</option>
+                            <option value="Реклама">Реклама</option>
+                            <option value="Показ/Дефиле">Показ/Дефиле</option>
+                            <option value="Выставка">Выставка</option>
+                            <option value="Промо-акция">Промо-акция</option>
+                            <option value="Каталог">Каталог</option>
+                            <option value="Другое">Другое</option>
+                        </select>
+                    </div>
+
+                    <!-- Шаг 2: Пол модели -->
+                    <div class="form-step" data-step="2">
+                        <h3 class="mb-4">Пол модели</h3>
                         <div class="row g-3">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <input type="radio" class="btn-check" name="gender" id="gender-female" value="female" required>
                                 <label class="btn btn-outline-dark w-100 py-4" for="gender-female">
                                     <i class="bi bi-gender-female d-block mb-2" style="font-size: 2rem;"></i>
                                     Женский
                                 </label>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <input type="radio" class="btn-check" name="gender" id="gender-male" value="male" required>
                                 <label class="btn btn-outline-dark w-100 py-4" for="gender-male">
                                     <i class="bi bi-gender-male d-block mb-2" style="font-size: 2rem;"></i>
                                     Мужской
                                 </label>
                             </div>
+                            <div class="col-4">
+                                <input type="radio" class="btn-check" name="gender" id="gender-any" value="any" required>
+                                <label class="btn btn-outline-dark w-100 py-4" for="gender-any">
+                                    <i class="bi bi-gender-ambiguous d-block mb-2" style="font-size: 2rem;"></i>
+                                    Не важно
+                                </label>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Шаг 2: Возраст -->
-                    <div class="form-step" data-step="2">
-                        <h3 class="mb-4">Укажите возраст</h3>
+                    <!-- Шаг 3: Возраст -->
+                    <div class="form-step" data-step="3">
+                        <h3 class="mb-4">Желаемый возраст модели</h3>
                         <select class="form-select form-select-lg" name="age" required>
                             <option value="">Выберите возрастную категорию</option>
                             <option value="0-3">0-3 года</option>
@@ -67,128 +109,153 @@
                             <option value="26-35">26-35 лет</option>
                             <option value="36-45">36-45 лет</option>
                             <option value="46+">46+ лет</option>
+                            <option value="Не важно">Не важно</option>
                         </select>
                     </div>
 
-                    <!-- Шаг 3: Цвет глаз -->
-                    <div class="form-step" data-step="3">
-                        <h3 class="mb-4">Цвет глаз</h3>
-                        <select class="form-select form-select-lg" name="eye_color" required>
-                            <option value="">Выберите цвет глаз</option>
-                            <option value="Карие">Карие</option>
-                            <option value="Голубые">Голубые</option>
-                            <option value="Зелёные">Зелёные</option>
-                            <option value="Серые">Серые</option>
-                            <option value="Чёрные">Чёрные</option>
-                        </select>
-                    </div>
-
-                    <!-- Шаг 4: Цвет волос -->
+                    <!-- Шаг 4: Рост -->
                     <div class="form-step" data-step="4">
+                        <h3 class="mb-4">Рост модели (см)</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="height_from" class="form-label">От</label>
+                                <input type="number" class="form-control form-control-lg" name="height_from" 
+                                       id="height_from" placeholder="Например: 165" min="50" max="250">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="height_to" class="form-label">До</label>
+                                <input type="number" class="form-control form-control-lg" name="height_to" 
+                                       id="height_to" placeholder="Например: 180" min="50" max="250">
+                            </div>
+                        </div>
+                        <small class="text-muted d-block mt-3">Оставьте пустым, если рост не важен</small>
+                    </div>
+
+                    <!-- Шаг 5: Размер одежды -->
+                    <div class="form-step" data-step="5">
+                        <h3 class="mb-4">Размер одежды</h3>
+                        <select class="form-select form-select-lg" name="clothing_size" required>
+                            <option value="">Выберите размер одежды</option>
+                            <option value="XS">XS (40-42)</option>
+                            <option value="S">S (42-44)</option>
+                            <option value="M">M (44-46)</option>
+                            <option value="L">L (46-48)</option>
+                            <option value="XL">XL (48-50)</option>
+                            <option value="XXL">XXL (50-52)</option>
+                            <option value="XXXL">XXXL (52+)</option>
+                            <option value="Не важно">Не важно</option>
+                        </select>
+                    </div>
+
+                    <!-- Шаг 6: Цвет волос -->
+                    <div class="form-step" data-step="6">
                         <h3 class="mb-4">Цвет волос</h3>
                         <select class="form-select form-select-lg" name="hair_color" required>
                             <option value="">Выберите цвет волос</option>
                             <option value="Блонд">Блонд</option>
                             <option value="Русый">Русый</option>
-                            <option value="Каштановый">Каштановый</option>
+                            <option value="Шатен">Шатен</option>
+                            <option value="Брюнет">Брюнет</option>
                             <option value="Рыжий">Рыжий</option>
-                            <option value="Чёрный">Чёрный</option>
                             <option value="Седой">Седой</option>
+                            <option value="Не важно">Не важно</option>
                         </select>
                     </div>
 
-                    <!-- Шаг 5: Рост -->
-                    <div class="form-step" data-step="5">
-                        <h3 class="mb-4">Рост (см)</h3>
-                        <input type="number" class="form-control form-control-lg" name="height" 
-                               placeholder="Например: 175" min="50" max="250" required>
-                    </div>
-
-                    <!-- Шаг 6: Вес -->
-                    <div class="form-step" data-step="6">
-                        <h3 class="mb-4">Вес (кг)</h3>
-                        <input type="number" class="form-control form-control-lg" name="weight" 
-                               placeholder="Например: 60" min="20" max="200" required>
-                    </div>
-
-                    <!-- Шаг 7: Обучение -->
+                    <!-- Шаг 7: Цвет глаз -->
                     <div class="form-step" data-step="7">
-                        <h3 class="mb-4">Обучались ли в школе моделей?</h3>
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <input type="radio" class="btn-check" name="model_school" id="school-yes" value="yes" required>
-                                <label class="btn btn-outline-dark w-100 py-4" for="school-yes">Да</label>
-                            </div>
-                            <div class="col-6">
-                                <input type="radio" class="btn-check" name="model_school" id="school-no" value="no" required>
-                                <label class="btn btn-outline-dark w-100 py-4" for="school-no">Нет</label>
-                            </div>
-                        </div>
+                        <h3 class="mb-4">Цвет глаз</h3>
+                        <select class="form-select form-select-lg" name="eye_color" required>
+                            <option value="">Выберите цвет глаз</option>
+                            <option value="Карие">Карие</option>
+                            <option value="Голубые">Голубые</option>
+                            <option value="Зеленые">Зеленые</option>
+                            <option value="Серые">Серые</option>
+                            <option value="Чёрные">Чёрные</option>
+                            <option value="Не важно">Не важно</option>
+                        </select>
                     </div>
 
-                    <!-- Шаг 8: Дефиле -->
+                    <!-- Шаг 8: Параметры фигуры (Грудь-Талия-Бедра) -->
                     <div class="form-step" data-step="8">
-                        <h3 class="mb-4">Навыки дефиле</h3>
-                        <select class="form-select form-select-lg" name="catwalk_skills" required>
-                            <option value="">Выберите уровень</option>
-                            <option value="Нет опыта">Нет опыта</option>
-                            <option value="Начальный">Начальный</option>
-                            <option value="Средний">Средний</option>
-                            <option value="Профессиональный">Профессиональный</option>
-                        </select>
+                        <h3 class="mb-4">Параметры фигуры (необязательно)</h3>
+                        <p class="text-muted mb-4">Укажите желаемые параметры модели, если это важно для проекта</p>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="bust" class="form-label">Грудь (см)</label>
+                                <input type="number" class="form-control form-control-lg" name="bust" 
+                                       id="bust" placeholder="90" min="60" max="150">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="waist" class="form-label">Талия (см)</label>
+                                <input type="number" class="form-control form-control-lg" name="waist" 
+                                       id="waist" placeholder="60" min="50" max="120">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="hips" class="form-label">Бедра (см)</label>
+                                <input type="number" class="form-control form-control-lg" name="hips" 
+                                       id="hips" placeholder="90" min="60" max="150">
+                            </div>
+                        </div>
+                        <small class="text-muted d-block mt-3">Оставьте пустым, если параметры не важны</small>
                     </div>
 
-                    <!-- Шаг 9: Позирование -->
+                    <!-- Шаг 9: Размер обуви -->
                     <div class="form-step" data-step="9">
-                        <h3 class="mb-4">Умение позировать</h3>
-                        <select class="form-select form-select-lg" name="posing_skills" required>
-                            <option value="">Выберите уровень</option>
-                            <option value="Нет опыта">Нет опыта</option>
-                            <option value="Начальный">Начальный</option>
-                            <option value="Средний">Средний</option>
-                            <option value="Профессиональный">Профессиональный</option>
-                        </select>
+                        <h3 class="mb-4">Размер обуви (необязательно)</h3>
+                        <input type="number" class="form-control form-control-lg" name="shoe_size" 
+                               placeholder="Например: 38" min="33" max="48" step="0.5">
+                        <small class="text-muted d-block mt-3">Оставьте пустым, если размер не важен</small>
                     </div>
 
-                    <!-- Шаг 10: Гражданство -->
+                    <!-- Шаг 10: Город съемки -->
                     <div class="form-step" data-step="10">
-                        <h3 class="mb-4">Гражданство</h3>
-                        <input type="text" class="form-control form-control-lg" name="citizenship" 
-                               placeholder="Например: РФ" required>
-                    </div>
-
-                    <!-- Шаг 11: Регион -->
-                    <div class="form-step" data-step="11">
-                        <h3 class="mb-4">Регион проживания</h3>
-                        <input type="text" class="form-control form-control-lg" name="region" 
+                        <h3 class="mb-4">Город, где нужна модель</h3>
+                        <input type="text" class="form-control form-control-lg" name="city" 
                                placeholder="Например: Москва" required>
+                        <small class="text-muted d-block mt-3">Укажите город, где будет проходить съемка/проект</small>
                     </div>
 
-                    <!-- Шаг 12: Фото -->
+                    <!-- Шаг 11: Детали проекта -->
+                    <div class="form-step" data-step="11">
+                        <h3 class="mb-4">Дополнительная информация о проекте</h3>
+                        <textarea class="form-control form-control-lg" name="project_description" rows="5" 
+                                  placeholder="Опишите ваш проект: дата съемки, локация, бюджет, особые требования..." required></textarea>
+                        <small class="text-muted d-block mt-2">Чем подробнее описание, тем точнее мы подберем модель</small>
+                    </div>
+
+                    <!-- Шаг 12: Контактная информация -->
                     <div class="form-step" data-step="12">
-                        <h3 class="mb-4">Загрузите фотографии</h3>
-                        <p class="text-muted mb-4">Загрузите от 3 до 5 фотографий (портрет, в полный рост, профиль)</p>
+                        <h3 class="mb-4">Ваши контактные данные</h3>
                         
-                        <div class="mb-4">
-                            <input type="file" class="form-control" name="photos[]" 
-                                   accept="image/*" multiple required id="photo-input">
-                            <small class="text-muted">Любые форматы изображений. Мы автоматически сжимаем и оптимизируем фотографии</small>
+                        <div class="mb-3">
+                            <label for="client_name" class="form-label">Ваше имя / Название компании</label>
+                            <input type="text" class="form-control form-control-lg" name="client_name" 
+                                   id="client_name" placeholder="Иван Иванов" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Телефон</label>
+                            <input type="tel" class="form-control form-control-lg" name="phone" 
+                                   id="phone" placeholder="+7 (999) 123-45-67" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control form-control-lg" name="email" 
+                                   id="email" placeholder="example@mail.ru" required>
                         </div>
 
-                        <div id="photo-preview" class="row g-3 mb-4"></div>
+                        <div class="mb-3">
+                            <label for="budget" class="form-label">Бюджет (необязательно)</label>
+                            <input type="text" class="form-control form-control-lg" name="budget" 
+                                   id="budget" placeholder="от 10 000 руб">
+                        </div>
 
-                        <h4 class="mb-3">Контактная информация</h4>
-                        <div class="mb-3">
-                            <input type="text" class="form-control" name="name" 
-                                   placeholder="Ваше имя" required>
-                        </div>
-                        <div class="mb-3">
-                            <input type="tel" class="form-control" name="phone" 
-                                   placeholder="Телефон" required>
-                        </div>
-                        <div class="mb-3">
-                            <input type="email" class="form-control" name="email" 
-                                   placeholder="Email (необязательно)">
+                        <div class="alert alert-info mt-4">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Что дальше?</strong><br>
+                            После отправки заявки наш менеджер свяжется с вами в течение 24 часов и предложит подходящие кандидатуры.
                         </div>
                     </div>
 
@@ -202,7 +269,7 @@
                         </button>
                         <button type="submit" class="btn btn-primary ms-auto" id="submit-btn" style="display: none;">
                             <span class="spinner-border spinner-border-sm me-2 d-none" id="submit-spinner"></span>
-                            <span id="submit-text">Отправить анкету</span>
+                            <span id="submit-text">Отправить заявку</span>
                         </button>
                     </div>
                 </form>
@@ -259,11 +326,24 @@ document.addEventListener('DOMContentLoaded', function() {
         currentStepElement.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
         
         inputs.forEach(input => {
-            // Пропускаем скрытые поля и чекбоксы
-            if (input.type === 'hidden' || input.type === 'checkbox') return;
+            // Пропускаем необязательные поля
+            if (!input.hasAttribute('required')) return;
             
-            // Проверяем required поля
-            if (input.hasAttribute('required') && !input.value.trim()) {
+            // Проверяем required поля для всех типов
+            if (input.type === 'radio' || input.type === 'checkbox') {
+                return; // Радио и чекбоксы проверяем отдельно ниже
+            }
+            
+            // Для select проверяем что выбрано значение (не пустая строка)
+            if (input.tagName === 'SELECT') {
+                if (!input.value || input.value === '') {
+                    showError(input, 'Пожалуйста, выберите вариант');
+                    isValid = false;
+                    return;
+                }
+            }
+            // Для textarea и input
+            else if (!input.value || !input.value.trim()) {
                 showError(input, 'Это поле обязательно для заполнения');
                 isValid = false;
                 return;
@@ -283,27 +363,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (input.name === 'phone' && input.value) {
                 const phonePattern = /^[\d\s\+\-\(\)]+$/;
                 if (!phonePattern.test(input.value) || input.value.replace(/\D/g, '').length < 10) {
-                    showError(input, 'Введите корректный номер телефона');
+                    showError(input, 'Введите корректный номер телефона (минимум 10 цифр)');
                     isValid = false;
                     return;
                 }
-            }
-            
-            // Проверяем числовые поля
-            if (input.type === 'number' && input.value) {
-                const num = parseInt(input.value);
-                if (isNaN(num) || num <= 0) {
-                    showError(input, 'Введите корректное число');
-                    isValid = false;
-                    return;
-                }
-            }
-            
-            // Проверяем файлы
-            if (input.type === 'file' && input.hasAttribute('required') && !input.files.length) {
-                showError(input, 'Загрузите фото');
-                isValid = false;
-                return;
             }
         });
         
@@ -318,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!checked) {
                 const firstRadio = currentStepElement.querySelector(`input[name="${groupName}"]`);
                 if (firstRadio) {
-                    showError(firstRadio.closest('.form-group') || firstRadio, 'Выберите один из вариантов');
+                    showError(firstRadio.closest('.row') || firstRadio, 'Выберите один из вариантов');
                     isValid = false;
                 }
             }
@@ -363,31 +426,6 @@ document.addEventListener('DOMContentLoaded', function() {
         spinner.classList.remove('d-none');
         submitText.textContent = 'Отправка...';
         submitBtn.disabled = true;
-    });
-
-    // Превью фото
-    const photoInput = document.getElementById('photo-input');
-    const photoPreview = document.getElementById('photo-preview');
-    
-    photoInput.addEventListener('change', function(e) {
-        photoPreview.innerHTML = '';
-        const files = Array.from(e.target.files).slice(0, 5);
-        
-        files.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const col = document.createElement('div');
-                col.className = 'col-4';
-                col.innerHTML = `
-                    <div class="position-relative">
-                        <img src="${e.target.result}" class="img-fluid" style="aspect-ratio: 1; object-fit: cover;">
-                        <span class="position-absolute top-0 end-0 badge bg-dark m-2">${index + 1}</span>
-                    </div>
-                `;
-                photoPreview.appendChild(col);
-            };
-            reader.readAsDataURL(file);
-        });
     });
 
     // Инициализация

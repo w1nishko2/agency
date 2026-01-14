@@ -68,7 +68,7 @@
                 <i class="bi bi-box-arrow-up-right me-1"></i>Посмотреть на сайте
             </a>
             
-            <form action="{{ route('admin.models.destroy', $model->id) }}" method="POST" onsubmit="return confirm('Удалить модель безвозвратно?')" class="ms-auto">
+            <form action="{{ route('admin.models.destroy', $model->id) }}" method="POST" class="delete-form ms-auto" data-confirm="Удалить модель {{ $model->full_name }} безвозвратно?">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-outline-danger">
@@ -87,9 +87,12 @@
                 <h5 class="mb-0"><i class="bi bi-images me-2"></i>Фотографии</h5>
             </div>
             <div class="content-card-body">
-                @if($model->main_photo)
+                @if($model->main_photo && \Storage::disk('public')->exists($model->main_photo))
                     <div class="mb-3">
-                        <img src="{{ asset('storage/' . $model->main_photo) }}" class="img-fluid rounded" alt="Главное фото">
+                        <img src="{{ asset('storage/' . $model->main_photo) }}" 
+                             class="img-fluid rounded" 
+                             alt="Главное фото"
+                             style="max-width: 100%; height: auto;">
                         <p class="text-muted small mt-2 mb-0">Главное фото</p>
                     </div>
                 @endif
@@ -98,9 +101,14 @@
                     <h6 class="mt-4 mb-3">Портфолио ({{ count($model->portfolio_photos) }})</h6>
                     <div class="row g-2">
                         @foreach($model->portfolio_photos as $photo)
-                            <div class="col-6">
-                                <img src="{{ asset('storage/' . $photo) }}" class="img-fluid rounded" alt="Фото">
-                            </div>
+                            @if(\Storage::disk('public')->exists($photo))
+                                <div class="col-6">
+                                    <img src="{{ asset('storage/' . $photo) }}" 
+                                         class="img-fluid rounded" 
+                                         alt="Фото"
+                                         style="max-width: 100%; height: auto;">
+                                </div>
+                            @endif
                         @endforeach
                     </div>
                 @endif
@@ -199,10 +207,6 @@
                         <p class="mb-0">{{ $model->phone ?? '—' }}</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="text-muted small">Instagram</label>
-                        <p class="mb-0">{{ $model->instagram ?? '—' }}</p>
-                    </div>
-                    <div class="col-md-6">
                         <label class="text-muted small">Telegram</label>
                         <p class="mb-0">{{ $model->telegram ?? '—' }}</p>
                     </div>
@@ -225,7 +229,7 @@
                     <h5 class="mb-0"><i class="bi bi-briefcase me-2"></i>Опыт работы</h5>
                 </div>
                 <div class="content-card-body">
-                    <p class="mb-0">{{ $model->experience_description }}</p>
+                    <p class="mb-0">{{ e($model->experience_description) }}</p>
                 </div>
             </div>
         @endif
@@ -244,8 +248,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Укажите причину отклонения заявки для <strong>{{ $model->full_name }}</strong>:</p>
-                    <textarea name="reason" class="form-control" rows="4" placeholder="Причина отклонения..." required></textarea>
+                    <p>Укажите причину отклонения заявки для <strong>{{ e($model->full_name) }}</strong>:</p>
+                    <textarea name="reason" class="form-control" rows="4" placeholder="Причина отклонения..." required maxlength="500"></textarea>
+                    <small class="text-muted">Максимум 500 символов</small>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>

@@ -29,9 +29,6 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <!-- Stub Functions CSS (Этап 2) -->
-    <link rel="stylesheet" href="{{ asset('css/stub-functions.css') }}">
     
     @stack('styles')
 </head>
@@ -56,7 +53,7 @@
                         <a class="nav-link" href="{{ url('/models') }}">Модели</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/casting') }}">Кастинг</a>
+                        <a class="nav-link" href="{{ url('/casting') }}">Подобрать модель</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url('/about') }}">О нас</a>
@@ -96,9 +93,6 @@
                     <!-- Социальные сети для десктопа -->
                     <li class="nav-item d-none d-lg-block ms-3">
                         <div class="social-links">
-                            <a href="https://instagram.com" target="_blank" aria-label="Instagram">
-                                <i class="bi bi-instagram"></i>
-                            </a>
                             <a href="https://vk.com" target="_blank" aria-label="VK">
                                 <i class="bi bi-globe"></i>
                             </a>
@@ -131,7 +125,7 @@
                     <ul class="list-unstyled small">
                         <li class="mb-2"><a href="{{ url('/') }}" class="text-muted text-decoration-none">Главная</a></li>
                         <li class="mb-2"><a href="{{ url('/models') }}" class="text-muted text-decoration-none">Модели</a></li>
-                        <li class="mb-2"><a href="{{ url('/casting') }}" class="text-muted text-decoration-none">Кастинг</a></li>
+                        <li class="mb-2"><a href="{{ url('/casting') }}" class="text-muted text-decoration-none">Подобрать модель</a></li>
                         <li class="mb-2"><a href="{{ url('/about') }}" class="text-muted text-decoration-none">О нас</a></li>
                     </ul>
                 </div>
@@ -154,9 +148,6 @@
                     </p>
                     
                     <div class="social-links">
-                        <a href="https://instagram.com" target="_blank" aria-label="Instagram">
-                            <i class="bi bi-instagram"></i>
-                        </a>
                         <a href="https://vk.com" target="_blank" aria-label="VK">
                             <i class="bi bi-globe"></i>
                         </a>
@@ -176,15 +167,6 @@
             </div>
         </div>
     </footer>
-
-    <!-- Stub Functions Script (Этап 2) -->
-    <script src="{{ asset('js/stub-functions.js') }}"></script>
-    
-    <!-- Demo Badge (можно убрать при желании) -->
-    <div class="stub-demo-badge">
-        <i class="bi bi-tools"></i>
-        Демо-версия (Этап 2)
-    </div>
 
     @stack('scripts')
 </body>

@@ -83,7 +83,7 @@ class ModelsController extends Controller
 
         // Знание языков
         if ($request->filled('languages')) {
-            $query->whereJsonContains('languages', $request->languages);
+            $query->whereRaw('JSON_CONTAINS(languages, ?)', [json_encode($request->languages)]);
         }
 
         // Дополнительные критерии (чекбоксы)
@@ -146,13 +146,20 @@ class ModelsController extends Controller
 
     public function show($id)
     {
-        $model = ModelProfile::active()->findOrFail($id);
-        $model->incrementViews();
+        // Валидация ID
+        $validated = validator(['id' => $id], ['id' => 'required|integer|min:1'])->validate();
+        $model = ModelProfile::active()->findOrFail($validated['id']);
+        
+        // Защита от ботов - incrementViews только для браузеров
+        $userAgent = request()->userAgent();
+        if ($userAgent && !preg_match('/bot|crawl|slurp|spider|mediapartners/i', $userAgent)) {
+            $model->incrementViews();
+        }
 
         $relatedModels = ModelProfile::active()
-            ->where('id', '!=', $id)
+            ->where('id', '!=', $validated['id'])
             ->where('gender', $model->gender)
-            ->inRandomOrder()
+            ->orderBy('views_count', 'desc')
             ->limit(4)
             ->get();
 
@@ -183,7 +190,6 @@ class ModelsController extends Controller
             'waist' => 'nullable|numeric',
             'hips' => 'nullable|numeric',
             'shoe_size' => 'nullable|numeric',
-            'instagram' => 'nullable|string',
             'vk' => 'nullable|string',
             'telegram' => 'nullable|string',
             'facebook' => 'nullable|string',

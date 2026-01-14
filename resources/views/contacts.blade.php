@@ -71,9 +71,6 @@
                 <div class="mb-4">
                     <h6 class="mb-3">Социальные сети</h6>
                     <div class="social-links">
-                        <a href="https://instagram.com" target="_blank" class="text-dark">
-                            <i class="bi bi-instagram"></i>
-                        </a>
                         <a href="https://vk.com" target="_blank" class="text-dark">
                             <i class="bi bi-globe"></i>
                         </a>

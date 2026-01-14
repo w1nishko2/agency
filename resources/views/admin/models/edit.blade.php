@@ -5,7 +5,7 @@
 @section('breadcrumbs')
     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Дашборд</a></li>
     <li class="breadcrumb-item"><a href="{{ route('admin.models.index') }}">Модели</a></li>
-    <li class="breadcrumb-item"><a href="{{ route('admin.models.show', $model->id) }}">{{ $model->full_name }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('admin.models.detail', $model->id) }}">{{ $model->full_name }}</a></li>
     <li class="breadcrumb-item active">Редактирование</li>
 @endsection
 
@@ -17,7 +17,7 @@
 <div class="content-card mb-4">
     <div class="content-card-body">
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.models.show', $model->id) }}" class="btn btn-outline-secondary">
+            <a href="{{ route('admin.models.detail', $model->id) }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left me-1"></i>К профилю
             </a>
             <a href="{{ route('admin.models.index') }}" class="btn btn-outline-secondary">
@@ -210,14 +210,6 @@
 
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label class="form-label">Instagram</label>
-                                    <input type="text" class="form-control @error('instagram') is-invalid @enderror" 
-                                           name="instagram" value="{{ old('instagram', $model->instagram) }}" placeholder="@username">
-                                    @error('instagram')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-md-4">
                                     <label class="form-label">Telegram</label>
                                     <input type="text" class="form-control @error('telegram') is-invalid @enderror" 
                                            name="telegram" value="{{ old('telegram', $model->telegram) }}" placeholder="@username">
@@ -271,7 +263,7 @@
                         <button type="submit" class="btn btn-primary btn-lg">
                             <i class="bi bi-save me-2"></i>Сохранить изменения
                         </button>
-                        <a href="{{ route('admin.models.show', $model->id) }}" class="btn btn-outline-secondary btn-lg">
+                        <a href="{{ route('admin.models.detail', $model->id) }}" class="btn btn-outline-secondary btn-lg">
                             Отмена
                         </a>
                     </div>

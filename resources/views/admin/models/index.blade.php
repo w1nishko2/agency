@@ -70,9 +70,14 @@
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        @if($model->main_photo)
+                                        @if($model->main_photo && \Storage::disk('public')->exists($model->main_photo))
                                             <img src="{{ asset('storage/' . $model->main_photo) }}" alt="{{ $model->full_name }}" 
-                                                 class="rounded me-3" style="width: 50px; height: 65px; object-fit: cover;">
+                                                 class="rounded me-3" style="width: 50px; height: 65px; object-fit: cover;"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center" 
+                                                 style="width: 50px; height: 65px; display: none;">
+                                                <i class="bi bi-person text-white"></i>
+                                            </div>
                                         @else
                                             <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center" 
                                                  style="width: 50px; height: 65px;">
@@ -113,7 +118,7 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons justify-content-end">
-                                        <a href="{{ route('admin.models.show', $model->id) }}" class="btn btn-sm btn-outline-primary" title="Просмотр">
+                                        <a href="{{ route('admin.models.detail', $model->id) }}" class="btn btn-sm btn-outline-primary" title="Просмотр">
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         
