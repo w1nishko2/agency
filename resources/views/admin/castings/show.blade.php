@@ -121,62 +121,8 @@
     </div>
 </div>
 
-<div class="row g-4">
-    <!-- Фотографии -->
-    <div class="col-lg-5">
-        <div class="content-card h-100">
-            <div class="content-card-header">
-                <h5 class="mb-0"><i class="bi bi-images me-2"></i>Фотографии</h5>
-            </div>
-            <div class="content-card-body">
-                                @if($application->photo_portrait && Storage::disk('public')->exists($application->photo_portrait))
-                                    <div class="mb-3">
-                                        <img src="{{ asset('storage/' . $application->photo_portrait) }}" 
-                                             class="img-fluid rounded" alt="Портрет">
-                                        <p class="text-muted small mt-2 mb-0">Портрет</p>
-                                    </div>
-                                @endif
-
-                                @if($application->photo_full_body && Storage::disk('public')->exists($application->photo_full_body))
-                                    <div class="mb-3">
-                                        <img src="{{ asset('storage/' . $application->photo_full_body) }}" 
-                                             class="img-fluid rounded" alt="В полный рост">
-                                        <p class="text-muted small mt-2 mb-0">В полный рост</p>
-                                    </div>
-                                @endif
-
-                                @if($application->photo_profile && Storage::disk('public')->exists($application->photo_profile))
-                                    <div class="mb-3">
-                                        <img src="{{ asset('storage/' . $application->photo_profile) }}" 
-                                             class="img-fluid rounded" alt="Профиль">
-                                        <p class="text-muted small mt-2 mb-0">Профиль</p>
-                                    </div>
-                                @endif
-
-                                @if(($application->photo_additional_1 && Storage::disk('public')->exists($application->photo_additional_1)) || 
-                                    ($application->photo_additional_2 && Storage::disk('public')->exists($application->photo_additional_2)))
-                                    <h6 class="mt-4 mb-3">Дополнительные фото</h6>
-                                    <div class="row g-2">
-                                        @if($application->photo_additional_1 && Storage::disk('public')->exists($application->photo_additional_1))
-                                            <div class="col-6">
-                                                <img src="{{ asset('storage/' . $application->photo_additional_1) }}" 
-                                                     class="img-fluid rounded" alt="Доп. фото 1">
-                                            </div>
-                                        @endif
-                                        @if($application->photo_additional_2 && Storage::disk('public')->exists($application->photo_additional_2))
-                                            <div class="col-6">
-                                                <img src="{{ asset('storage/' . $application->photo_additional_2) }}" 
-                                                     class="img-fluid rounded" alt="Доп. фото 2">
-                                            </div>
-                                        @endif
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Информация -->
-                    <div class="col-lg-7">
+                    <div class="col-12">
                         <!-- Основная информация -->
                         <div class="content-card mb-4">
                             <div class="content-card-header">

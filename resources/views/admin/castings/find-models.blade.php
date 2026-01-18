@@ -87,6 +87,21 @@
     </div>
 </div>
 
+<!-- Уведомление о приближенном поиске -->
+@if(isset($isFallback) && $isFallback)
+<div class="alert alert-warning mb-4">
+    <div class="d-flex">
+        <div class="me-3">
+            <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+        </div>
+        <div>
+            <h6 class="alert-heading mb-2">Показаны приближенные результаты</h6>
+            <p class="mb-0">По указанным критериям не найдено точных совпадений. Показаны модели с близкими характеристиками, отсортированные по степени соответствия.</p>
+        </div>
+    </div>
+</div>
+@endif
+
 <!-- Легенда совпадений -->
 <div class="alert alert-info mb-4">
     <div class="row g-2 align-items-center">
@@ -101,6 +116,9 @@
         </div>
         <div class="col-auto">
             <span class="badge bg-warning">30-59%</span> Частично подходит
+        </div>
+        <div class="col-auto">
+            <span class="badge bg-secondary">0-29%</span> Приближенные варианты
         </div>
     </div>
 </div>
@@ -176,8 +194,26 @@
                                 <i class="bi bi-geo-alt me-1"></i>{{ $model->city }}
                             </div>
                             <div class="d-flex gap-2 mb-3 flex-wrap">
-                                <span class="badge bg-secondary">{{ $model->age }} лет</span>
-                                <span class="badge bg-secondary">{{ $model->height }} см</span>
+                                <span class="badge bg-secondary">
+                                    {{ $model->age }} лет
+                                    @if(isset($model->match_details['age_diff']) && $model->match_details['age_diff'] > 0)
+                                        <small class="ms-1">(±{{ $model->match_details['age_diff'] }})</small>
+                                    @endif
+                                </span>
+                                <span class="badge bg-secondary">
+                                    {{ $model->height }} см
+                                    @if(isset($model->match_details['height_diff']) && $model->match_details['height_diff'] > 0)
+                                        <small class="ms-1">(±{{ $model->match_details['height_diff'] }})</small>
+                                    @endif
+                                </span>
+                                @if($model->weight)
+                                <span class="badge bg-secondary">
+                                    {{ $model->weight }} кг
+                                    @if(isset($model->match_details['weight_diff']) && $model->match_details['weight_diff'] > 0)
+                                        <small class="ms-1">(±{{ $model->match_details['weight_diff'] }})</small>
+                                    @endif
+                                </span>
+                                @endif
                                 @if($model->clothing_size)
                                 <span class="badge bg-secondary">{{ $model->clothing_size }}</span>
                                 @endif

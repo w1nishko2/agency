@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CastingApplication;
+use App\Models\TelegramBotSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -139,134 +140,213 @@ class CastingAdminController extends Controller
         $validated = validator(['id' => $id], ['id' => 'required|integer|min:1'])->validate();
         $application = CastingApplication::findOrFail($validated['id']);
         
-        // ОПТИМИЗАЦИЯ: Применяем фильтры прямо в SQL запросе
-        $query = \App\Models\ModelProfile::where('status', 'active');
+        // Логируем критерии поиска для отладки
+        \Log::info('Finding models for casting', [
+            'casting_id' => $application->id,
+            'gender' => $application->gender,
+            'age' => $application->age,
+            'height' => $application->height,
+            'weight' => $application->weight,
+            'eye_color' => $application->eye_color,
+            'hair_color' => $application->hair_color,
+        ]);
         
-        // Обязательные критерии применяем в SQL
+        // Сначала пробуем точный поиск
+        $query = \App\Models\ModelProfile::where('status', 'active');
+        $exactQuery = clone $query;
+        $hasStrictCriteria = false;
+        
+        // Обязательный критерий - пол
         if ($application->gender && $application->gender !== 'any') {
+            $exactQuery->where('gender', $application->gender);
             $query->where('gender', $application->gender);
         }
         
-        // Возраст ±10 лет (более широкий диапазон для первичной фильтрации)
+        // Возраст ±10 лет (строгий поиск)
         if ($application->age && $application->age > 0) {
-            $query->whereBetween('age', [
+            $hasStrictCriteria = true;
+            $exactQuery->whereBetween('age', [
                 max(16, $application->age - 10), 
                 $application->age + 10
             ]);
         }
         
-        // Рост ±15 см
+        // Рост ±15 см (строгий поиск)
         if ($application->height && $application->height > 0) {
-            $query->whereBetween('height', [
+            $hasStrictCriteria = true;
+            $exactQuery->whereBetween('height', [
                 $application->height - 15, 
                 $application->height + 15
             ]);
         }
         
-        // Вес ±15 кг
+        // Вес ±15 кг (строгий поиск)
         if ($application->weight && $application->weight > 0) {
-            $query->whereBetween('weight', [
-                max(40, $application->weight - 15), 
-                $application->weight + 15
-            ]);
+            $hasStrictCriteria = true;
+            $exactQuery->where(function($q) use ($application) {
+                $q->whereNull('weight')
+                  ->orWhereBetween('weight', [
+                      max(40, $application->weight - 15), 
+                      $application->weight + 15
+                  ]);
+            });
         }
         
-        // Точные совпадения
-        if ($application->eye_color && $application->eye_color !== '-') {
-            $query->where('eye_color', $application->eye_color);
+        // Точные совпадения цвета (строгий поиск)
+        if ($application->eye_color && $application->eye_color !== '-' && $application->eye_color !== 'Не важно') {
+            $hasStrictCriteria = true;
+            $exactQuery->where('eye_color', $application->eye_color);
         }
         
-        if ($application->hair_color && $application->hair_color !== '-') {
-            $query->where('hair_color', $application->hair_color);
+        if ($application->hair_color && $application->hair_color !== '-' && $application->hair_color !== 'Не важно') {
+            $hasStrictCriteria = true;
+            $exactQuery->where('hair_color', $application->hair_color);
         }
         
-        // Получаем отфильтрованные модели с пагинацией
-        $models = $query->orderBy('created_at', 'desc')->paginate(12);
+        // Пытаемся получить точные совпадения
+        $exactCount = $exactQuery->count();
+        $isFallback = false;
         
-        // Рассчитываем процент совпадения только для загруженных моделей
-        $models->getCollection()->transform(function($model) use ($application) {
-            $totalCriteria = 0;
-            $matchedCriteria = 0;
-            
-            // Пол
-            if ($application->gender && $application->gender !== 'any') {
-                $totalCriteria++;
-                if ($model->gender === $application->gender) {
-                    $matchedCriteria++;
-                }
-            }
-            
-            // Возраст (±5 лет = 100%, ±10 лет = 50%)
-            if ($application->age && $application->age > 0) {
-                $totalCriteria++;
-                $ageDiff = abs($model->age - $application->age);
-                if ($ageDiff <= 5) {
-                    $matchedCriteria += 1;
-                } elseif ($ageDiff <= 10) {
-                    $matchedCriteria += 0.5;
-                }
-            }
-            
-            // Рост (±7 см = 100%, ±15 см = 50%)
-            if ($application->height && $application->height > 0) {
-                $totalCriteria++;
-                $heightDiff = abs($model->height - $application->height);
-                if ($heightDiff <= 7) {
-                    $matchedCriteria += 1;
-                } elseif ($heightDiff <= 15) {
-                    $matchedCriteria += 0.5;
-                }
-            }
-            
-            // Вес (±7 кг = 100%, ±15 кг = 50%)
-            if ($application->weight && $application->weight > 0 && $model->weight) {
-                $totalCriteria++;
-                $weightDiff = abs($model->weight - $application->weight);
-                if ($weightDiff <= 7) {
-                    $matchedCriteria += 1;
-                } elseif ($weightDiff <= 15) {
-                    $matchedCriteria += 0.5;
-                }
-            }
-            
-            // Размер одежды
-            if ($application->clothing_size && $application->clothing_size !== '-') {
-                $totalCriteria++;
-                if ($model->clothing_size === $application->clothing_size) {
-                    $matchedCriteria++;
-                }
-            }
-            
-            // Цвет глаз
-            if ($application->eye_color && $application->eye_color !== '-') {
-                $totalCriteria++;
-                if ($model->eye_color === $application->eye_color) {
-                    $matchedCriteria++;
-                }
-            }
-            
-            // Цвет волос
-            if ($application->hair_color && $application->hair_color !== '-') {
-                $totalCriteria++;
-                if ($model->hair_color === $application->hair_color) {
-                    $matchedCriteria++;
-                }
-            }
-            
-            // Опыт работы
-            if ($application->has_experience) {
-                $totalCriteria++;
-                if ($model->experience_years > 0) {
-                    $matchedCriteria++;
-                }
-            }
-            
-            // Рассчитываем процент
-            $model->match_percent = $totalCriteria > 0 ? round(($matchedCriteria / $totalCriteria) * 100) : 0;
-            return $model;
-        });
+        \Log::info('Exact matches found', ['count' => $exactCount]);
         
-        return view('admin.castings.find-models', compact('application', 'models'));
+        // Если точных совпадений нет и были строгие критерии - используем расширенный поиск
+        if ($exactCount === 0 && $hasStrictCriteria) {
+            \Log::info('No exact matches, using fallback search');
+            $isFallback = true;
+            // Расширенный поиск - только по полу, сортируем по близости к критериям
+            $models = $query->get();
+        } else {
+            // Используем точный поиск с пагинацией
+            $models = $exactQuery->orderBy('created_at', 'desc')->paginate(12);
+        }
+        
+        // Если получили коллекцию, преобразуем в пагинатор
+        if (!$isFallback) {
+            // Рассчитываем процент совпадения для точных результатов
+            $models->getCollection()->transform(function($model) use ($application) {
+                return $this->calculateMatchPercent($model, $application);
+            });
+        } else {
+            // Рассчитываем процент для всех моделей и сортируем по совпадению
+            $models = $models->map(function($model) use ($application) {
+                return $this->calculateMatchPercent($model, $application);
+            })->sortByDesc('match_percent')->values();
+            
+            // Создаем пагинатор вручную
+            $perPage = 12;
+            $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage();
+            $currentPageItems = $models->slice(($currentPage - 1) * $perPage, $perPage);
+            
+            $models = new \Illuminate\Pagination\LengthAwarePaginator(
+                $currentPageItems,
+                $models->count(),
+                $perPage,
+                $currentPage,
+                ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+            );
+        }
+        
+        return view('admin.castings.find-models', compact('application', 'models', 'isFallback'));
+    }
+    
+    /**
+     * Рассчитать процент совпадения модели с критериями кастинга
+     */
+    private function calculateMatchPercent($model, $application)
+    {
+        $totalCriteria = 0;
+        $matchedCriteria = 0;
+        
+        // Пол (обязательный критерий)
+        if ($application->gender && $application->gender !== 'any') {
+            $totalCriteria++;
+            if ($model->gender === $application->gender) {
+                $matchedCriteria++;
+            }
+        }
+        
+        // Возраст (±5 лет = 100%, ±10 лет = 50%, ±20 лет = 25%)
+        if ($application->age && $application->age > 0 && $model->age > 0) {
+            $totalCriteria++;
+            $ageDiff = abs($model->age - $application->age);
+            if ($ageDiff <= 5) {
+                $matchedCriteria += 1;
+            } elseif ($ageDiff <= 10) {
+                $matchedCriteria += 0.5;
+            } elseif ($ageDiff <= 20) {
+                $matchedCriteria += 0.25;
+            }
+        }
+        
+        // Рост (±7 см = 100%, ±15 см = 50%, ±30 см = 25%)
+        if ($application->height && $application->height > 0 && $model->height > 0) {
+            $totalCriteria++;
+            $heightDiff = abs($model->height - $application->height);
+            if ($heightDiff <= 7) {
+                $matchedCriteria += 1;
+            } elseif ($heightDiff <= 15) {
+                $matchedCriteria += 0.5;
+            } elseif ($heightDiff <= 30) {
+                $matchedCriteria += 0.25;
+            }
+        }
+        
+        // Вес (±7 кг = 100%, ±15 кг = 50%, ±25 кг = 25%)
+        if ($application->weight && $application->weight > 0 && $model->weight) {
+            $totalCriteria++;
+            $weightDiff = abs($model->weight - $application->weight);
+            if ($weightDiff <= 7) {
+                $matchedCriteria += 1;
+            } elseif ($weightDiff <= 15) {
+                $matchedCriteria += 0.5;
+            } elseif ($weightDiff <= 25) {
+                $matchedCriteria += 0.25;
+            }
+        }
+        
+        // Размер одежды
+        if ($application->clothing_size && $application->clothing_size !== '-') {
+            $totalCriteria++;
+            if ($model->clothing_size === $application->clothing_size) {
+                $matchedCriteria++;
+            }
+        }
+        
+        // Цвет глаз
+        if ($application->eye_color && $application->eye_color !== '-' && $application->eye_color !== 'Не важно') {
+            $totalCriteria++;
+            if ($model->eye_color === $application->eye_color) {
+                $matchedCriteria++;
+            }
+        }
+        
+        // Цвет волос
+        if ($application->hair_color && $application->hair_color !== '-' && $application->hair_color !== 'Не важно') {
+            $totalCriteria++;
+            if ($model->hair_color === $application->hair_color) {
+                $matchedCriteria++;
+            }
+        }
+        
+        // Опыт работы
+        if ($application->has_experience) {
+            $totalCriteria++;
+            if ($model->experience_years > 0) {
+                $matchedCriteria++;
+            }
+        }
+        
+        // Рассчитываем процент
+        $model->match_percent = $totalCriteria > 0 ? round(($matchedCriteria / $totalCriteria) * 100) : 0;
+        
+        // Добавляем детальную информацию о совпадениях
+        $model->match_details = [
+            'height_diff' => $application->height && $model->height ? abs($model->height - $application->height) : null,
+            'age_diff' => $application->age && $model->age ? abs($model->age - $application->age) : null,
+            'weight_diff' => $application->weight && $model->weight ? abs($model->weight - $application->weight) : null,
+        ];
+        
+        return $model;
     }
 
     /**
@@ -305,19 +385,109 @@ class CastingAdminController extends Controller
         $application->selected_models = json_encode($selectedModels);
         $application->save();
         
+        // Получаем настройки бота
+        $botSettings = TelegramBotSettings::current();
+        $telegramSentCount = 0;
+        $emailSentCount = 0;
+        
+        // Отправляем уведомления моделям
+        foreach ($models as $model) {
+            // Отправляем email через очередь
+            if ($model->email) {
+                \Illuminate\Support\Facades\Mail::to($model->email)
+                    ->queue(new \App\Mail\CastingInvitationMail($model, $application));
+                
+                $emailSentCount++;
+                
+                Log::info('Casting invitation email queued', [
+                    'model_id' => $model->id,
+                    'model_email' => $model->email,
+                    'casting_id' => $application->id
+                ]);
+            }
+            
+            // Отправляем Telegram сообщение, если у модели привязан аккаунт и бот настроен
+            if ($model->user && $model->user->telegram_id && $botSettings->isConfigured() && $botSettings->is_active) {
+                $message = "🎬 <b>Новое приглашение на кастинг!</b>\n\n";
+                $message .= "Вас пригласили на кастинг:\n\n";
+                
+                if ($application->project_name) {
+                    $message .= "📋 <b>Проект:</b> " . htmlspecialchars($application->project_name) . "\n";
+                }
+                
+                if ($application->date) {
+                    $message .= "📅 <b>Дата:</b> " . $application->date . "\n";
+                }
+                
+                if ($application->location) {
+                    $message .= "📍 <b>Место:</b> " . htmlspecialchars($application->location) . "\n";
+                }
+                
+                if ($application->notes) {
+                    $message .= "\n💬 <b>Описание:</b>\n" . htmlspecialchars($application->notes) . "\n";
+                }
+                
+                $message .= "\n✅ Пожалуйста, подтвердите ваше участие.";
+                
+                try {
+                    $response = \Illuminate\Support\Facades\Http::post(
+                        "https://api.telegram.org/bot{$botSettings->bot_token}/sendMessage",
+                        [
+                            'chat_id' => $model->user->telegram_id,
+                            'text' => $message,
+                            'parse_mode' => 'HTML'
+                        ]
+                    );
+                    
+                    if ($response->successful() && $response->json('ok')) {
+                        $telegramSentCount++;
+                        
+                        Log::info('Casting invitation sent via Telegram', [
+                            'model_id' => $model->id,
+                            'telegram_id' => $model->user->telegram_id,
+                            'casting_id' => $application->id
+                        ]);
+                    } else {
+                        Log::warning('Failed to send Telegram message', [
+                            'model_id' => $model->id,
+                            'telegram_id' => $model->user->telegram_id,
+                            'error' => $response->json('description')
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Exception sending Telegram message', [
+                        'model_id' => $model->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+        }
+        
         Log::info('Models assigned to casting', [
             'application_id' => $application->id,
             'models_count' => count($modelIds),
             'model_ids' => $modelIds,
+            'emails_queued' => $emailSentCount,
+            'telegram_sent' => $telegramSentCount,
             'admin_id' => auth()->id(),
             'admin_name' => auth()->user()->name
         ]);
         
+        $successMessage = 'Выбрано ' . count($modelIds) . ' ' . 
+                   (count($modelIds) === 1 ? 'модель' : (count($modelIds) < 5 ? 'модели' : 'моделей')) . 
+                   ' для кастинга. ';
+        
+        if ($emailSentCount > 0) {
+            $successMessage .= "Email отправлен: {$emailSentCount}. ";
+        }
+        
+        if ($telegramSentCount > 0) {
+            $successMessage .= "Telegram уведомлений: {$telegramSentCount}.";
+        }
+        
         return redirect()
             ->route('admin.castings.show', $id)
-            ->with('success', 'Выбрано ' . count($modelIds) . ' ' . 
-                   (count($modelIds) === 1 ? 'модель' : (count($modelIds) < 5 ? 'модели' : 'моделей')) . 
-                   ' для кастинга');
+            ->with('success', $successMessage);
     }
 
     /**

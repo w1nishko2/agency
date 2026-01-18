@@ -56,6 +56,9 @@
                         <a class="nav-link" href="{{ url('/casting') }}">Подобрать модель</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('models.register') }}">Стать моделью</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ url('/about') }}">О нас</a>
                     </li>
                     <li class="nav-item">

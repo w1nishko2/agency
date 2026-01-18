@@ -168,7 +168,8 @@ class ModelsController extends Controller
 
     public function registerForm()
     {
-        return view('models.register');
+        $user = auth()->user();
+        return view('models.register', compact('user'));
     }
 
     public function registerSubmit(Request $request)

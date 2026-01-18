@@ -67,7 +67,8 @@ Route::get('/auth/yandex/callback', [YandexAuthController::class, 'handleYandexC
 
 // VK OAuth
 Route::get('/auth/vk', [VkAuthController::class, 'redirectToVk'])->name('auth.vk');
-Route::get('/auth/vk/callback', [VkAuthController::class, 'handleVkCallback'])->name('auth.vk.callback');
+Route::get('/auth/vk/callback', [VkAuthController::class, 'handleVkCallback']);
+Route::post('/auth/vk/callback', [VkAuthController::class, 'handleVkCallback'])->name('auth.vk.callback');
 
 // Профиль модели (защищенные маршруты)
 Route::middleware(['auth'])->group(function () {
@@ -75,6 +76,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/upload-photos', [ProfileController::class, 'uploadPhotos'])->name('profile.upload-photos');
     Route::delete('/profile/photos/{index}', [ProfileController::class, 'deletePhoto'])->name('profile.delete-photo');
+    Route::post('/profile/telegram/generate-key', [ProfileController::class, 'generateTelegramKey'])->name('profile.telegram.generate-key');
+    Route::post('/profile/telegram/unlink', [ProfileController::class, 'unlinkTelegram'])->name('profile.telegram.unlink');
 });
 
 // Админка
@@ -116,6 +119,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/blog/{id}/edit', [\App\Http\Controllers\Admin\BlogAdminController::class, 'edit'])->name('blog.edit');
     Route::put('/blog/{id}', [\App\Http\Controllers\Admin\BlogAdminController::class, 'update'])->name('blog.update');
     Route::delete('/blog/{id}', [\App\Http\Controllers\Admin\BlogAdminController::class, 'destroy'])->name('blog.destroy');
+
+    // Telegram Bot
+    Route::get('/telegram-bot', [\App\Http\Controllers\Admin\TelegramBotController::class, 'index'])->name('telegram-bot.index');
+    Route::put('/telegram-bot', [\App\Http\Controllers\Admin\TelegramBotController::class, 'update'])->name('telegram-bot.update');
+    Route::post('/telegram-bot/test', [\App\Http\Controllers\Admin\TelegramBotController::class, 'testConnection'])->name('telegram-bot.test');
+    Route::post('/telegram-bot/webhook', [\App\Http\Controllers\Admin\TelegramBotController::class, 'setWebhook'])->name('telegram-bot.webhook.set');
+    Route::delete('/telegram-bot/webhook', [\App\Http\Controllers\Admin\TelegramBotController::class, 'deleteWebhook'])->name('telegram-bot.webhook.delete');
+    Route::get('/telegram-bot/webhook/info', [\App\Http\Controllers\Admin\TelegramBotController::class, 'getWebhookInfo'])->name('telegram-bot.webhook.info');
 });
 
 if (app()->environment('production')) {

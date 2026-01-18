@@ -348,6 +348,11 @@
                 <div class="menu-section-title">Система</div>
             </div>
             
+            <a href="{{ route('admin.telegram-bot.index') }}" class="sidebar-link {{ request()->routeIs('admin.telegram-bot.*') ? 'active' : '' }}">
+                <i class="bi bi-telegram"></i>
+                <span>Telegram Бот</span>
+            </a>
+            
             <a href="{{ route('home') }}" class="sidebar-link" target="_blank">
                 <i class="bi bi-box-arrow-up-right"></i>
                 <span>Перейти на сайт</span>

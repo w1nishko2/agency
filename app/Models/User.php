@@ -25,6 +25,10 @@ class User extends Authenticatable
         'yandex_id',
         'avatar',
         'vk_id',
+        'telegram_id',
+        'telegram_username',
+        'telegram_bind_key',
+        'telegram_bind_key_expires_at',
     ];
 
     /**
@@ -45,6 +49,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'telegram_bind_key_expires_at' => 'datetime',
     ];
 
     /**

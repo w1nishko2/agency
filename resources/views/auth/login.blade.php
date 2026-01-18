@@ -1,93 +1,187 @@
-@extends('layouts.app')
+@extends('layouts.main')
+
+@section('title', 'Вход - Golden Models')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
+<section class="py-5" style="min-height: 80vh; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="text-center mb-4">
+                    <h2 class="mb-2">Вход в аккаунт</h2>
+                    <p class="text-muted">Войдите, чтобы продолжить</p>
+                </div>
 
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+                        @if($errors->any())
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                @foreach($errors->all() as $error)
+                                    {{ $error }}
+                                @endforeach
+                            </div>
+                        @endif
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+                        <form method="POST" action="{{ route('login') }}">
+                            @csrf
 
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email адрес</label>
+                                <input id="email" 
+                                       type="email" 
+                                       class="form-control @error('email') is-invalid @enderror" 
+                                       name="email" 
+                                       value="{{ old('email') }}" 
+                                       required 
+                                       autocomplete="email" 
+                                       autofocus
+                                       placeholder="your@email.com">
                                 @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                        </div>
 
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
-
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Пароль</label>
+                                <input id="password" 
+                                       type="password" 
+                                       class="form-control @error('password') is-invalid @enderror" 
+                                       name="password" 
+                                       required 
+                                       autocomplete="current-password"
+                                       placeholder="••••••••">
                                 @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                        </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6 offset-md-4">
+                            <div class="mb-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           name="remember" 
+                                           id="remember" 
+                                           {{ old('remember') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="remember">
-                                        {{ __('Remember Me') }}
+                                        Запомнить меня
                                     </label>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    Войти
                                 </button>
-
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
-                                    </a>
-                                @endif
                             </div>
-                        </div>
 
-                        <div class="row mb-0 mt-4">
-                            <div class="col-md-8 offset-md-4">
-                                <div class="d-grid gap-2">
-                                    <a href="{{ route('auth.yandex') }}" class="btn btn-outline-danger">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-right me-2" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0z"/>
-                                            <path fill-rule="evenodd" d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
-                                        </svg>
-                                        Войти через Яндекс
-                                    </a>
-                                    <a href="{{ route('auth.vk') }}" class="btn btn-outline-primary">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-vk me-2" viewBox="0 0 16 16">
-                                            <path d="M15.545 8.232c.086.248.086.5.086.75 0 3.314-2.686 6-6 6s-6-2.686-6-6c0-.25 0-.502.086-.75a5.921 5.921 0 0 1 .436-1.112 5.921 5.921 0 0 1 .656-.933 5.923 5.923 0 0 1 .853-.751 5.925 5.925 0 0 1 1.014-.6 5.933 5.933 0 0 1 1.115-.348c.242-.05.488-.088.737-.113A5.946 5.946 0 0 1 9.568 4h.864c.422 0 .84.052 1.248.148.249.025.495.063.737.113a5.933 5.933 0 0 1 1.115.348c.363.143.706.332 1.014.6.308.267.584.568.853.751.219.15.428.32.656.933.159.349.295.72.436 1.112z"/>
-                                        </svg>
-                                        Войти через VK
+                            @if (Route::has('password.request'))
+                                <div class="text-center mb-4">
+                                    <a class="text-muted small" href="{{ route('password.request') }}">
+                                        Забыли пароль?
                                     </a>
                                 </div>
-                            </div>
+                            @endif
+                        </form>
+
+                        <hr class="my-4">
+
+                        <div class="text-center mb-3">
+                            <p class="text-muted small">Или войдите через</p>
                         </div>
-                    </form>
+
+                        <!-- Яндекс OAuth -->
+                        <div class="d-grid gap-2 mb-2">
+                            <a href="{{ route('auth.yandex') }}" class="btn btn-outline-danger">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Войти через Яндекс
+                            </a>
+                        </div>
+
+                        <!-- VK ID SDK Widget (VK, Mail.ru, OK.ru) -->
+                        <div id="vk-auth-container" class="d-grid gap-2"></div>
+
+                        <script src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js?v={{ time() }}"></script>
+                        <script type="text/javascript">
+                            if ('VKIDSDK' in window) {
+                                const VKID = window.VKIDSDK;
+
+                                VKID.Config.init({
+                                    app: {!! config('services.vkid.client_id') !!},
+                                    redirectUrl: '{!! route('auth.vk.callback') !!}',
+                                    responseMode: VKID.ConfigResponseMode.Callback,
+                                    source: VKID.ConfigSource.LOWCODE,
+                                    scope: 'email phone'
+                                });
+
+                                const oAuth = new VKID.OAuthList();
+
+                                oAuth.render({
+                                    container: document.getElementById('vk-auth-container'),
+                                    oauthList: [
+                                        'vkid',
+                                        'mail_ru',
+                                        'ok_ru'
+                                    ]
+                                })
+                                .on(VKID.WidgetEvents.ERROR, vkidOnError)
+                                .on(VKID.OAuthListInternalEvents.LOGIN_SUCCESS, function (payload) {
+                                    const code = payload.code;
+                                    const deviceId = payload.device_id;
+
+                                    // Обмениваем код на токен через VK ID SDK
+                                    VKID.Auth.exchangeCode(code, deviceId)
+                                        .then(function(data) {
+                                            // Отправляем данные пользователя на сервер
+                                            const form = document.createElement('form');
+                                            form.method = 'POST';
+                                            form.action = '{!! route('auth.vk.callback') !!}';
+                                            
+                                            const csrfToken = document.createElement('input');
+                                            csrfToken.type = 'hidden';
+                                            csrfToken.name = '_token';
+                                            csrfToken.value = '{{ csrf_token() }}';
+                                            form.appendChild(csrfToken);
+                                            
+                                            const accessToken = document.createElement('input');
+                                            accessToken.type = 'hidden';
+                                            accessToken.name = 'access_token';
+                                            accessToken.value = data.access_token;
+                                            form.appendChild(accessToken);
+                                            
+                                            document.body.appendChild(form);
+                                            form.submit();
+                                        })
+                                        .catch(vkidOnError);
+                                });
+
+                                function vkidOnSuccess(data) {
+                                    console.log('VK ID Success:', data);
+                                }
+
+                                function vkidOnError(error) {
+                                    console.error('VK ID Error:', error);
+                                    alert('Ошибка авторизации через VK ID. Попробуйте снова.');
+                                }
+                            }
+                        </script>
+
+                        <hr class="my-4">
+
+                        <div class="text-center">
+                            <p class="text-muted mb-0">
+                                Нет аккаунта? 
+                                <a href="{{ route('register') }}" class="text-decoration-none fw-bold">
+                                    Зарегистрироваться
+                                </a>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
 @endsection

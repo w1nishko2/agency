@@ -42,6 +42,15 @@
 
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-4 p-md-5">
+                        
+                        @auth
+                        <div class="alert alert-info border-0 mb-4">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <strong>Вы авторизованы как {{ $user->name }}</strong><br>
+                            <small>Email и телефон будут использованы из вашего аккаунта. Это защитит вас от случайных ошибок при заполнении формы.</small>
+                        </div>
+                        @endauth
+
                         <form action="{{ route('models.register.submit') }}" method="POST" enctype="multipart/form-data" id="registerForm">
                             @csrf
 
@@ -51,7 +60,11 @@
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label for="name" class="form-label">Имя</label>
-                                    <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}">
+                                    @auth
+                                        <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name ?? '') }}">
+                                    @else
+                                        <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}">
+                                    @endauth
                                 </div>
                                 <div class="col-md-6">
                                     <label for="surname" class="form-label">Фамилия</label>
@@ -76,12 +89,24 @@
 
                             <div class="mb-4">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}">
+                                @auth
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ $user->email }}" readonly style="background-color: #e9ecef;">
+                                    <small class="form-text text-muted">
+                                        <i class="bi bi-lock-fill me-1"></i>
+                                        Email привязан к вашему аккаунту и не может быть изменен
+                                    </small>
+                                @else
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}">
+                                @endauth
                             </div>
 
                             <div class="mb-4">
                                 <label for="phone" class="form-label">Телефон</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" value="{{ old('phone') }}" placeholder="+7 (999) 123-45-67">
+                                @auth
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ old('phone', $user->phone ?? '') }}" placeholder="+7 (999) 123-45-67">
+                                @else
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ old('phone') }}" placeholder="+7 (999) 123-45-67">
+                                @endauth
                             </div>
 
                             <hr class="my-5">

@@ -5,9 +5,11 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
+use Laravel\Socialite\Facades\Socialite;
 use App\Models\ModelProfile;
 use App\Models\CastingApplication;
 use App\Models\Booking;
+use App\Services\VkIdProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Регистрация кастомного провайдера для VK ID
+        Socialite::extend('vkid', function ($app) {
+            $config = $app['config']['services.vkid'];
+            return Socialite::buildProvider(VkIdProvider::class, $config);
+        });
+        
         // View Composer для админ-сайдбара (кеширование счетчиков на 5 минут)
         View::composer('layouts.admin', function ($view) {
             $view->with('sidebar_stats', [
