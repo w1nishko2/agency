@@ -6,7 +6,7 @@
 @section('content')
 
 <!-- Hero блок -->
-<section class="py-5" style="background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('{{ asset('imgsite/photo_4_2025-11-27_12-56-07.webp') }}') center/cover;">
+<section class="py-5" style="background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('{{ asset('imgsite/photo/photo_4_2026-01-24_11-43-44.webp') }}') center/cover;">
     <div class="container">
         <h1 class="mb-3">КАТАЛОГ МОДЕЛЕЙ</h1>
         <p class="lead text-muted">Найдите идеальную модель для вашего проекта</p>
@@ -302,14 +302,14 @@
                                 <div class="position-relative overflow-hidden">
                                     @if($model->photos && count($model->photos) > 0)
                                         <img src="{{ asset('storage/' . $model->photos[0]) }}" 
-                                             class="card-img-top" 
+                                             class="card-img-top loaded" 
                                              style="aspect-ratio: 3/4; object-fit: cover;"
                                              alt="{{ $model->full_name }}"
                                              loading="lazy">
                                     @else
-                                        <img src="{{ asset('imgsite/photo_4_2025-11-27_12-56-07.webp') }}" 
-                                             alt="{{ $model->full_name }}" 
-                                             class="card-img-top"
+                                        <img src="{{ asset('imgsite/placeholder.svg') }}" 
+                                             alt="Фото отсутствует" 
+                                             class="card-img-top loaded"
                                              style="aspect-ratio: 3/4; object-fit: cover;"
                                              loading="lazy">
                                     @endif
@@ -448,25 +448,34 @@
 
     // Создание HTML карточки модели
     function createModelCard(model) {
-        const photoUrl = model.main_photo 
-            ? `/storage/${model.main_photo}` 
-            : '/imgsite/photo_4_2025-11-27_12-56-07.webp';
+        // Получаем базовый URL сайта
+        const baseUrl = '{{ url('/') }}';
+        
+        // Формируем правильный путь к фото
+        let photoUrl;
+        if (model.photos && model.photos.length > 0) {
+            photoUrl = `${baseUrl}/storage/${model.photos[0]}`;
+        } else {
+            photoUrl = `${baseUrl}/imgsite/placeholder.svg`;
+        }
+        
+        const modelName = model.full_name || `${model.first_name || ''} ${model.last_name || ''}`.trim() || 'Без имени';
         
         const photoHtml = `<img src="${photoUrl}" 
-                     class="card-img-top" 
+                     class="card-img-top loaded" 
                      style="aspect-ratio: 3/4; object-fit: cover;"
-                     alt="${model.name}"
+                     alt="${modelName}"
                      loading="lazy">`;
         
         return `
             <div class="col-md-6 col-lg-4">
-                <a href="/model/${model.id}" class="text-decoration-none text-dark">
+                <a href="${baseUrl}/model/${model.id}" class="text-decoration-none text-dark">
                     <div class="card h-100 shadow-sm">
                         <div class="position-relative overflow-hidden">
                             ${photoHtml}
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title mb-2">${model.name}</h5>
+                            <h5 class="card-title mb-2">${modelName}</h5>
                             <p class="text-muted small mb-2">
                                 <i class="bi bi-geo-alt me-1"></i>${model.city || 'Не указан'}
                             </p>
@@ -589,5 +598,24 @@
         filters.sort = this.value;
         resetModels();
     });
+
+    // Обработка загрузки изображений (для изображений без класса loaded)
+    function setupLazyLoadImages() {
+        document.querySelectorAll('img[loading="lazy"]:not(.loaded)').forEach(img => {
+            if (img.complete) {
+                img.classList.add('loaded');
+            } else {
+                img.addEventListener('load', function() {
+                    this.classList.add('loaded');
+                });
+                img.addEventListener('error', function() {
+                    this.classList.add('loaded'); // Показываем даже если ошибка
+                });
+            }
+        });
+    }
+
+    // Инициализация при загрузке страницы
+    setupLazyLoadImages();
 </script>
 @endpush

@@ -392,6 +392,15 @@ class CastingAdminController extends Controller
         
         // Отправляем уведомления моделям
         foreach ($models as $model) {
+            Log::info('Processing model for casting invitation', [
+                'model_id' => $model->id,
+                'model_name' => $model->full_name,
+                'model_email' => $model->email,
+                'has_user' => !is_null($model->user),
+                'user_id' => $model->user_id,
+                'telegram_id' => $model->user ? $model->user->telegram_id : null
+            ]);
+            
             // Отправляем email через очередь
             if ($model->email) {
                 \Illuminate\Support\Facades\Mail::to($model->email)
@@ -401,33 +410,43 @@ class CastingAdminController extends Controller
                 
                 Log::info('Casting invitation email queued', [
                     'model_id' => $model->id,
+                    'model_name' => $model->full_name,
                     'model_email' => $model->email,
                     'casting_id' => $application->id
+                ]);
+            } else {
+                Log::warning('Model has no email', [
+                    'model_id' => $model->id,
+                    'model_name' => $model->full_name
                 ]);
             }
             
             // Отправляем Telegram сообщение, если у модели привязан аккаунт и бот настроен
             if ($model->user && $model->user->telegram_id && $botSettings->isConfigured() && $botSettings->is_active) {
                 $message = "🎬 <b>Новое приглашение на кастинг!</b>\n\n";
-                $message .= "Вас пригласили на кастинг:\n\n";
+                $message .= "Вас выбрали для участия в кастинге!\n\n";
                 
-                if ($application->project_name) {
-                    $message .= "📋 <b>Проект:</b> " . htmlspecialchars($application->project_name) . "\n";
+                $message .= "👤 <b>Заявка:</b> " . htmlspecialchars($application->full_name) . "\n";
+                $message .= "📍 <b>Город:</b> " . htmlspecialchars($application->city) . "\n";
+                
+                if ($application->gender) {
+                    $gender = $application->gender === 'male' ? 'Мужчина' : 'Женщина';
+                    $message .= "⚧ <b>Пол:</b> " . $gender . "\n";
                 }
                 
-                if ($application->date) {
-                    $message .= "📅 <b>Дата:</b> " . $application->date . "\n";
+                if ($application->age) {
+                    $message .= "🎂 <b>Возраст:</b> " . $application->age . " лет\n";
                 }
                 
-                if ($application->location) {
-                    $message .= "📍 <b>Место:</b> " . htmlspecialchars($application->location) . "\n";
+                if ($application->height) {
+                    $message .= "📏 <b>Рост:</b> " . $application->height . " см\n";
                 }
                 
-                if ($application->notes) {
-                    $message .= "\n💬 <b>Описание:</b>\n" . htmlspecialchars($application->notes) . "\n";
+                if ($application->categories_interest && is_array($application->categories_interest) && count($application->categories_interest) > 0) {
+                    $message .= "🎯 <b>Интересы:</b> " . implode(', ', array_map('htmlspecialchars', $application->categories_interest)) . "\n";
                 }
                 
-                $message .= "\n✅ Пожалуйста, подтвердите ваше участие.";
+                $message .= "\n✅ Пожалуйста, свяжитесь с агентством для уточнения деталей.";
                 
                 try {
                     $response = \Illuminate\Support\Facades\Http::post(
@@ -444,12 +463,15 @@ class CastingAdminController extends Controller
                         
                         Log::info('Casting invitation sent via Telegram', [
                             'model_id' => $model->id,
+                            'model_name' => $model->full_name,
                             'telegram_id' => $model->user->telegram_id,
+                            'telegram_username' => $model->user->telegram_username,
                             'casting_id' => $application->id
                         ]);
                     } else {
                         Log::warning('Failed to send Telegram message', [
                             'model_id' => $model->id,
+                            'model_name' => $model->full_name,
                             'telegram_id' => $model->user->telegram_id,
                             'error' => $response->json('description')
                         ]);
@@ -457,13 +479,38 @@ class CastingAdminController extends Controller
                 } catch (\Exception $e) {
                     Log::error('Exception sending Telegram message', [
                         'model_id' => $model->id,
+                        'model_name' => $model->full_name,
                         'error' => $e->getMessage()
                     ]);
+                }
+            } else {
+                // Логируем почему не отправили Telegram
+                if (!$model->user) {
+                    Log::info('Model has no linked user account', [
+                        'model_id' => $model->id,
+                        'model_name' => $model->full_name
+                    ]);
+                } elseif (!$model->user->telegram_id) {
+                    Log::info('User has no linked Telegram account', [
+                        'model_id' => $model->id,
+                        'model_name' => $model->full_name,
+                        'user_id' => $model->user_id
+                    ]);
+                } elseif (!$botSettings->isConfigured()) {
+                    Log::warning('Bot not configured');
+                } elseif (!$botSettings->is_active) {
+                    Log::warning('Bot not active');
                 }
             }
         }
         
         Log::info('Models assigned to casting', [
+            'casting_id' => $application->id,
+            'total_models' => count($modelIds),
+            'emails_sent' => $emailSentCount,
+            'telegrams_sent' => $telegramSentCount,
+            'selected_model_ids' => $modelIds
+        ]);
             'application_id' => $application->id,
             'models_count' => count($modelIds),
             'model_ids' => $modelIds,

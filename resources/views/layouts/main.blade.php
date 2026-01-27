@@ -14,7 +14,7 @@
     <!-- OG теги -->
     <meta property="og:title" content="@yield('og_title', 'Golden Models - Модельное агентство')">
     <meta property="og:description" content="@yield('og_description', 'Кастинг, подбор и продвижение моделей')">
-    <meta property="og:image" content="@yield('og_image', asset('images/og-image.jpg'))">
+    <meta property="og:image" content="@yield('og_image', asset('imgsite/photo/photo_1_2026-01-24_11-43-44.webp'))">
     <meta property="og:type" content="website">
     
     @stack('meta')

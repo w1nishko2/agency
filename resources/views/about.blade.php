@@ -6,7 +6,7 @@
 @section('content')
 
 <!-- Hero -->
-<section class="py-5" style="background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('{{ asset('imgsite/photo_2_2025-11-27_12-56-07.webp') }}') center/cover;">
+<section class="py-5" style="background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('{{ asset('imgsite/photo/photo_2_2026-01-24_11-43-44.webp') }}') center/cover;">
     <div class="container text-center">
         <h1 class="mb-3">О НАС</h1>
         <p class="lead text-muted">Профессиональное модельное агентство полного цикла</p>
@@ -18,7 +18,7 @@
     <div class="container">
         <div class="row align-items-center mb-5">
             <div class="col-lg-6 mb-4 mb-lg-0 order-lg-2">
-                <img src="{{ asset('imgsite/photo_3_2025-11-27_12-56-07.webp') }}" 
+                <img src="{{ asset('imgsite/photo/photo_3_2026-01-24_11-43-44.webp') }}" 
                      alt="Golden Models История" 
                      class="img-fluid rounded shadow"
                      style="width: 100%; height: 500px; object-fit: cover;">

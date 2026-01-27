@@ -148,9 +148,9 @@
                                      class="img-fluid" 
                                      alt="Фото профиля">
                             @else
-                                <img src="{{ asset('imgsite/photo_3_2025-11-27_12-56-07.webp') }}" 
+                                <img src="{{ asset('imgsite/placeholder.svg') }}" 
                                      class="img-fluid" 
-                                     alt="Фото профиля"
+                                     alt="Фото отсутствует"
                                      style="aspect-ratio: 3/4; object-fit: cover;">
                             @endif
                         </div>

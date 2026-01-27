@@ -9,7 +9,7 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #ffffff;
         }
         .email-container {
             max-width: 600px;
@@ -17,48 +17,56 @@
             background-color: #ffffff;
         }
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #000000;
             padding: 40px 20px;
             text-align: center;
             color: #ffffff;
+            border-bottom: 1px solid #000000;
         }
         .header h1 {
             margin: 0;
             font-size: 28px;
-            font-weight: 600;
-            letter-spacing: 1px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
         }
         .header p {
             margin: 10px 0 0 0;
-            font-size: 16px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             opacity: 0.9;
         }
         .content {
             padding: 40px 30px;
         }
         .greeting {
-            font-size: 18px;
-            color: #333333;
+            font-size: 14px;
+            color: #000000;
             margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
         .message {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #555555;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #000000;
             margin-bottom: 30px;
         }
         .casting-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 12px;
+            background-color: #f8f8f8;
+            border: 1px solid #000000;
             padding: 25px;
             margin: 30px 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .casting-card h2 {
-            color: #333333;
-            font-size: 20px;
+            color: #000000;
+            font-size: 16px;
             margin: 0 0 20px 0;
-            font-weight: 600;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         .casting-info {
             display: table;
@@ -70,15 +78,19 @@
         .info-label {
             display: table-cell;
             padding: 8px 15px 8px 0;
-            font-weight: 600;
-            color: #555555;
+            font-weight: 700;
+            color: #000000;
             white-space: nowrap;
             width: 40%;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .info-value {
             display: table-cell;
             padding: 8px 0;
-            color: #333333;
+            color: #000000;
+            font-size: 14px;
         }
         .button-container {
             text-align: center;
@@ -87,50 +99,52 @@
         .button {
             display: inline-block;
             padding: 14px 35px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #000000;
             color: #ffffff;
             text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 16px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 2px solid #000000;
             transition: all 0.3s ease;
         }
         .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            background-color: #ffffff;
+            color: #000000;
         }
         .footer {
-            background-color: #f8f9fa;
+            background-color: #000000;
             padding: 30px;
             text-align: center;
-            color: #777777;
-            font-size: 14px;
-            border-top: 1px solid #e0e0e0;
+            color: #ffffff;
+            font-size: 12px;
+            border-top: 1px solid #000000;
         }
         .footer p {
             margin: 5px 0;
         }
         .footer a {
-            color: #667eea;
+            color: #ffffff;
             text-decoration: none;
+            border-bottom: 1px solid #ffffff;
         }
         .divider {
             height: 1px;
-            background: linear-gradient(to right, transparent, #cccccc, transparent);
+            background-color: #000000;
             margin: 25px 0;
         }
         .highlight {
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
+            background-color: #f8f8f8;
+            border: 1px solid #000000;
             padding: 15px;
             margin: 20px 0;
-            border-radius: 4px;
         }
         .highlight p {
             margin: 0;
-            color: #856404;
-            font-size: 14px;
+            color: #000000;
+            font-size: 12px;
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -138,7 +152,7 @@
     <div class="email-container">
         <!-- Header -->
         <div class="header">
-            <h1>🌟 GOLDEN MODELS</h1>
+            <h1>GOLDEN MODELS</h1>
             <p>Приглашение на кастинг</p>
         </div>
 
@@ -149,13 +163,13 @@
             </div>
 
             <div class="message">
-                <p>Мы рады сообщить, что вы были отобраны для участия в кастинге!</p>
+                <p>Мы рады сообщить, что вы были отобраны для участия в кастинге.</p>
                 <p>Ваш профиль идеально подходит под требования заказчика, и мы приглашаем вас принять участие.</p>
             </div>
 
             <!-- Casting Card -->
             <div class="casting-card">
-                <h2>📋 Детали кастинга</h2>
+                <h2>Детали кастинга</h2>
                 <div class="casting-info">
                     <div class="info-row">
                         <div class="info-label">Номер заявки:</div>
@@ -189,15 +203,15 @@
             
             @if($casting->about)
             <div style="margin-bottom: 20px;">
-                <h3 style="color: #333333; font-size: 16px; margin-bottom: 10px;">О проекте:</h3>
-                <p style="color: #555555; line-height: 1.6; margin: 0;">{{ $casting->about }}</p>
+                <h3 style="color: #000000; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">О проекте:</h3>
+                <p style="color: #000000; line-height: 1.8; margin: 0; font-size: 14px;">{{ $casting->about }}</p>
             </div>
             @endif
 
             @if($casting->motivation)
             <div style="margin-bottom: 20px;">
-                <h3 style="color: #333333; font-size: 16px; margin-bottom: 10px;">Детали:</h3>
-                <p style="color: #555555; line-height: 1.6; margin: 0;">{{ $casting->motivation }}</p>
+                <h3 style="color: #000000; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Детали:</h3>
+                <p style="color: #000000; line-height: 1.8; margin: 0; font-size: 14px;">{{ $casting->motivation }}</p>
             </div>
             @endif
             @endif
@@ -212,8 +226,8 @@
 
             <div class="divider"></div>
 
-            <div style="text-align: center; color: #777777; font-size: 14px;">
-                <p>Если у вас есть вопросы, свяжитесь с нами:</p>
+            <div style="text-align: center; color: #000000; font-size: 12px;">
+                <p style="text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Если у вас есть вопросы, свяжитесь с нами:</p>
                 <p><strong>Email:</strong> {{ config('mail.from.address') }}</p>
                 @if($casting->phone)
                 <p><strong>Телефон заказчика:</strong> {{ $casting->phone }}</p>
@@ -223,14 +237,14 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p><strong>Golden Models</strong></p>
-            <p>Профессиональное модельное агентство</p>
+            <p style="font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">GOLDEN MODELS</p>
+            <p style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase;">Профессиональное модельное агентство</p>
             <p style="margin-top: 15px;">
                 <a href="{{ url('/') }}">Наш сайт</a> | 
                 <a href="{{ url('/models') }}">Каталог моделей</a> | 
                 <a href="{{ url('/contact') }}">Контакты</a>
             </p>
-            <p style="margin-top: 15px; font-size: 12px; color: #999999;">
+            <p style="margin-top: 15px; font-size: 10px; opacity: 0.7;">
                 Вы получили это письмо, потому что зарегистрированы в модельном агентстве Golden Models.
             </p>
         </div>

@@ -6,7 +6,7 @@
 @section('content')
 
 <!-- Hero -->
-<section class="py-5" style="background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('{{ asset('imgsite/photo_5_2025-11-27_12-56-07.webp') }}') center/cover;">
+<section class="py-5" style="background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('{{ asset('imgsite/photo/photo_5_2026-01-24_11-43-44.webp') }}') center/cover;">
     <div class="container">
         <h1 class="mb-3">БЛОГ</h1>
         <p class="lead text-muted">Новости, советы и тренды модельной индустрии</p>
@@ -36,7 +36,7 @@
                                              alt="{{ $firstPost->title }}"
                                              loading="lazy">
                                     @else
-                                        <img src="{{ asset('imgsite/photo_5_2025-11-27_12-56-07.webp') }}" 
+                                        <img src="{{ asset('imgsite/photo/photo_5_2026-01-24_11-43-44.webp') }}" 
                                              class="img-fluid h-100" 
                                              style="object-fit: cover;"
                                              alt="{{ $firstPost->title }}"
@@ -82,7 +82,7 @@
                                                      alt="{{ $post->title }}"
                                                      loading="lazy">
                                             @else
-                                                <img src="{{ asset('imgsite/photo_6_2025-11-27_12-56-07.webp') }}" 
+                                                <img src="{{ asset('imgsite/photo/photo_6_2026-01-24_11-43-44.webp') }}" 
                                                      class="img-fluid h-100" 
                                                      style="object-fit: cover;"
                                                      alt="{{ $post->title }}"
@@ -168,7 +168,7 @@
                                      style="width: 80px; height: 80px; object-fit: cover;"
                                      alt="{{ $popularPost->title }}">
                             @else
-                                <img src="{{ asset('imgsite/photo_7_2025-11-27_12-56-07.webp') }}" 
+                                <img src="{{ asset('imgsite/photo/photo_7_2026-01-24_11-43-44.webp') }}" 
                                      class="me-3" 
                                      style="width: 80px; height: 80px; object-fit: cover;"
                                      alt="{{ $popularPost->title }}">

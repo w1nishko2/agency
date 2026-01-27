@@ -6,14 +6,14 @@
 @section('content')
 
 <!-- Hero Section -->
-<section class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('{{ asset('imgsite/photo_1_2025-11-27_12-56-07.webp') }}') center/cover;">
+<section class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('{{ asset('imgsite/photo/photo_1_2026-01-24_11-43-44.webp') }}') center/cover;">
     <div class="hero-overlay"></div>
     <div class="hero-content container">
         <h1 class="hero-title animate__animated animate__fadeInDown">GOLDEN MODELS</h1>
         <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">Профессиональное модельное агентство</p>
         <div class="d-flex gap-3 justify-content-center flex-wrap animate__animated animate__fadeInUp animate__delay-2s">
-            <a href="{{ url('/models') }}" class="btn btn-primary btn-lg">Каталог моделей</a>
-            <a href="{{ route('models.register') }}" class="btn btn-outline-light btn-lg">Стать моделью</a>
+            <a href="{{ url('/models') }}" class="btn btn-lg" style="background-color: rgba(0, 0, 0, 0.3); color: white; backdrop-filter: blur(5px);">Каталог моделей</a>
+            <a href="{{ route('models.register') }}" class="btn btn-outline-light btn-lg" style="background-color: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px);">Стать моделью</a>
         </div>
     </div>
 </section>
@@ -23,10 +23,23 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
-                <img src="{{ asset('imgsite/photo_2_2025-11-27_12-56-07.webp') }}" 
-                     alt="Golden Models" 
-                     class="img-fluid rounded shadow"
-                     style="width: 100%; height: 500px; object-fit: cover;">
+                <div class="position-relative rounded shadow overflow-hidden" style="height: 500px;">
+                    @php
+                        $photos = [
+                            'photo_2_2026-01-24_11-43-44.webp',
+                            'photo_3_2026-01-24_11-43-44.webp',
+                            'photo_4_2026-01-24_11-43-44.webp',
+                            'photo_6_2026-01-24_11-43-44.webp',
+                        ];
+                    @endphp
+                    @foreach($photos as $index => $photo)
+                    <img src="{{ asset('imgsite/photo/' . $photo) }}" 
+                         alt="Golden Models {{ $index + 1 }}" 
+                         class="carousel-image position-absolute w-100 h-100"
+                         style="object-fit: cover; opacity: {{ $index === 0 ? 1 : 0 }}; transition: opacity 1s ease-in-out;"
+                         data-index="{{ $index }}">
+                    @endforeach
+                </div>
             </div>
             <div class="col-lg-6 text-center text-lg-start">
                 <span class="text-uppercase text-muted small d-block mb-2">О нас</span>
@@ -101,8 +114,8 @@
                                  style="aspect-ratio: 3/4; object-fit: cover;"
                                  loading="lazy">
                         @else
-                            <img src="{{ asset('imgsite/photo_3_2025-11-27_12-56-07.webp') }}" 
-                                 alt="{{ $model->full_name }}" 
+                            <img src="{{ asset('imgsite/placeholder.svg') }}" 
+                                 alt="Фото отсутствует" 
                                  class="card-img-top"
                                  style="aspect-ratio: 3/4; object-fit: cover;"
                                  loading="lazy">
@@ -463,6 +476,26 @@
             // partnersScroll.addEventListener('mouseleave', function() {
             //     scrollInterval = setInterval(autoScroll, scrollDelay);
             // });
+        }
+
+        // Карусель фотографий в секции "О нас"
+        const carouselImages = document.querySelectorAll('.carousel-image');
+        if (carouselImages.length > 0) {
+            let currentIndex = 0;
+            
+            function changeImage() {
+                // Скрываем текущее изображение
+                carouselImages[currentIndex].style.opacity = '0';
+                
+                // Переходим к следующему изображению
+                currentIndex = (currentIndex + 1) % carouselImages.length;
+                
+                // Показываем следующее изображение
+                carouselImages[currentIndex].style.opacity = '1';
+            }
+            
+            // Меняем изображение каждые 3 секунды
+            setInterval(changeImage, 3000);
         }
     });
 </script>

@@ -19,8 +19,8 @@
                              class="img-fluid mb-3"
                              style="aspect-ratio: 3/4; object-fit: cover;">
                     @else
-                        <img src="{{ asset('imgsite/photo_4_2025-11-27_12-56-07.webp') }}" 
-                             alt="{{ e($model->full_name) }}" 
+                        <img src="{{ asset('imgsite/placeholder.svg') }}" 
+                             alt="Фото отсутствует"
                              class="img-fluid mb-3"
                              style="aspect-ratio: 3/4; object-fit: cover;">
                     @endif

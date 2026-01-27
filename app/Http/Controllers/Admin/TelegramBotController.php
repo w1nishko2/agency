@@ -43,7 +43,6 @@ class TelegramBotController extends Controller
             'bot_username' => 'nullable|string',
             'admin_telegram_id' => 'nullable|string',
             'welcome_message' => 'nullable|string|max:4096',
-            'is_active' => 'boolean',
         ], [
             'bot_token.required' => 'Токен бота обязателен для заполнения',
             'welcome_message.max' => 'Приветственное сообщение не должно превышать 4096 символов',
@@ -64,7 +63,7 @@ class TelegramBotController extends Controller
             'welcome_message',
         ]));
         
-        $settings->is_active = $request->has('is_active');
+        $settings->is_active = $request->boolean('is_active');
         $settings->save();
 
         return redirect()
