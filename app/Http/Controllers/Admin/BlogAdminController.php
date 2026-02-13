@@ -87,9 +87,12 @@ class BlogAdminController extends Controller
         $validated['is_featured'] = $request->has('is_featured');
         $validated['allow_comments'] = $request->has('allow_comments');
         
-        // Санитизация content (удаление опасных тегов)
+        // Санитизация content (удаление опасных тегов, но сохраняем форматирование Quill)
         if (!empty($validated['content'])) {
-            $validated['content'] = strip_tags($validated['content'], '<p><br><strong><em><u><a><ul><ol><li><h1><h2><h3><h4><h5><h6><blockquote><code><pre><img>');
+            $validated['content'] = strip_tags(
+                $validated['content'], 
+                '<p><br><strong><em><u><s><strike><a><ul><ol><li><h1><h2><h3><h4><h5><h6><blockquote><code><pre><img><span><div>'
+            );
         }
 
         DB::beginTransaction();
@@ -146,10 +149,11 @@ class BlogAdminController extends Controller
             
             Log::error('Blog post creation failed', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'admin_id' => auth()->id()
             ]);
             
-            return back()->withInput()->withErrors(['error' => 'Ошибка при создании статьи']);
+            return back()->withInput()->withErrors(['error' => 'Ошибка при создании статьи: ' . $e->getMessage()]);
         }
     }
 
@@ -197,9 +201,12 @@ class BlogAdminController extends Controller
         $validated['is_featured'] = $request->has('is_featured');
         $validated['allow_comments'] = $request->has('allow_comments');
         
-        // Санитизация content
+        // Санитизация content (удаление опасных тегов, но сохраняем форматирование Quill)
         if (!empty($validated['content'])) {
-            $validated['content'] = strip_tags($validated['content'], '<p><br><strong><em><u><a><ul><ol><li><h1><h2><h3><h4><h5><h6><blockquote><code><pre><img>');
+            $validated['content'] = strip_tags(
+                $validated['content'], 
+                '<p><br><strong><em><u><s><strike><a><ul><ol><li><h1><h2><h3><h4><h5><h6><blockquote><code><pre><img><span><div>'
+            );
         }
 
         DB::beginTransaction();

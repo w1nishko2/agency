@@ -187,24 +187,54 @@
 @push('styles')
 <!-- Lightbox для галереи -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+<!-- Quill стили для корректного отображения контента -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <style>
+.article-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #333;
+}
 .article-content p {
     margin-bottom: 1.5rem;
-    line-height: 1.8;
+}
+.article-content h1 {
+    font-size: 2.5rem;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
 }
 .article-content h2 {
-    font-size: 1.75rem;
+    font-size: 2rem;
     margin-top: 3rem;
     margin-bottom: 1rem;
+    font-weight: 600;
 }
 .article-content h3 {
+    font-size: 1.75rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+.article-content h4 {
     font-size: 1.5rem;
     margin-top: 2rem;
     margin-bottom: 1rem;
 }
+.article-content h5 {
+    font-size: 1.25rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+.article-content h6 {
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
 .article-content ul,
 .article-content ol {
     margin-bottom: 1.5rem;
+    padding-left: 2rem;
 }
 .article-content ul li,
 .article-content ol li {
@@ -215,6 +245,7 @@
     height: auto;
     margin: 2rem 0;
     border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .article-content blockquote {
     border-left: 4px solid #000;
@@ -222,6 +253,67 @@
     margin: 2rem 0;
     font-style: italic;
     color: #666;
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+}
+.article-content pre {
+    background: #f4f4f4;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}
+.article-content code {
+    background: #f4f4f4;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+.article-content pre code {
+    background: transparent;
+    padding: 0;
+}
+.article-content a {
+    color: #007bff;
+    text-decoration: underline;
+}
+.article-content a:hover {
+    color: #0056b3;
+}
+.article-content strong {
+    font-weight: 700;
+}
+.article-content em {
+    font-style: italic;
+}
+.article-content u {
+    text-decoration: underline;
+}
+.article-content s,
+.article-content strike {
+    text-decoration: line-through;
+}
+/* Выравнивание текста из Quill */
+.article-content .ql-align-center {
+    text-align: center;
+}
+.article-content .ql-align-right {
+    text-align: right;
+}
+.article-content .ql-align-justify {
+    text-align: justify;
+}
+/* Отступы для списков из Quill */
+.article-content .ql-indent-1 {
+    padding-left: 3em;
+}
+.article-content .ql-indent-2 {
+    padding-left: 6em;
+}
+.article-content .ql-indent-3 {
+    padding-left: 9em;
 }
 </style>
 @endpush

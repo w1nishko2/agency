@@ -41,11 +41,11 @@
                 <!-- Прогресс-бар -->
                 <div class="mb-5">
                     <div class="d-flex justify-content-between mb-2">
-                        <small class="text-muted">Шаг <span id="current-step">1</span> из 12</small>
-                        <small class="text-muted"><span id="progress-percent">8</span>%</small>
+                        <small class="text-muted">Шаг <span id="current-step">1</span> из 14</small>
+                        <small class="text-muted"><span id="progress-percent">7</span>%</small>
                     </div>
                     <div class="progress" style="height: 3px;">
-                        <div id="progress-bar" class="progress-bar bg-dark" role="progressbar" style="width: 8%"></div>
+                        <div id="progress-bar" class="progress-bar bg-dark" role="progressbar" style="width: 7%"></div>
                     </div>
                 </div>
 
@@ -176,8 +176,38 @@
                         </select>
                     </div>
 
-                    <!-- Шаг 8: Параметры фигуры (Грудь-Талия-Бедра) -->
+                    <!-- Шаг 8: Тип внешности -->
                     <div class="form-step" data-step="8">
+                        <h3 class="mb-4">Тип внешности</h3>
+                        <select class="form-select form-select-lg" name="appearance_type" required>
+                            <option value="">Выберите тип внешности</option>
+                            <option value="Славянский">Славянский</option>
+                            <option value="Европейский">Европейский</option>
+                            <option value="Азиатский">Азиатский</option>
+                            <option value="Афро">Афро</option>
+                            <option value="Мулат">Мулат</option>
+                            <option value="Не важно">Не важно</option>
+                        </select>
+                    </div>
+
+                    <!-- Шаг 9: Знание языков -->
+                    <div class="form-step" data-step="9">
+                        <h3 class="mb-4">Знание иностранных языков (необязательно)</h3>
+                        <p class="text-muted mb-4">Нужны ли знания иностранных языков для проекта?</p>
+                        <select class="form-select form-select-lg" name="languages">
+                            <option value="">Не важно</option>
+                            <option value="Английский">Английский</option>
+                            <option value="Немецкий">Немецкий</option>
+                            <option value="Французский">Французский</option>
+                            <option value="Испанский">Испанский</option>
+                            <option value="Итальянский">Итальянский</option>
+                            <option value="Китайский">Китайский</option>
+                        </select>
+                        <small class="text-muted d-block mt-3">Можно оставить пустым, если знание языков не требуется</small>
+                    </div>
+
+                    <!-- Шаг 10: Параметры фигуры (Грудь-Талия-Бедра) -->
+                    <div class="form-step" data-step="10">
                         <h3 class="mb-4">Параметры фигуры (необязательно)</h3>
                         <p class="text-muted mb-4">Укажите желаемые параметры модели, если это важно для проекта</p>
                         <div class="row g-3">
@@ -200,32 +230,32 @@
                         <small class="text-muted d-block mt-3">Оставьте пустым, если параметры не важны</small>
                     </div>
 
-                    <!-- Шаг 9: Размер обуви -->
-                    <div class="form-step" data-step="9">
+                    <!-- Шаг 11: Размер обуви -->
+                    <div class="form-step" data-step="11">
                         <h3 class="mb-4">Размер обуви (необязательно)</h3>
                         <input type="number" class="form-control form-control-lg" name="shoe_size" 
                                placeholder="Например: 38" min="33" max="48" step="0.5">
                         <small class="text-muted d-block mt-3">Оставьте пустым, если размер не важен</small>
                     </div>
 
-                    <!-- Шаг 10: Город съемки -->
-                    <div class="form-step" data-step="10">
+                    <!-- Шаг 12: Город съемки -->
+                    <div class="form-step" data-step="12">
                         <h3 class="mb-4">Город, где нужна модель</h3>
                         <input type="text" class="form-control form-control-lg" name="city" 
                                placeholder="Например: Москва" required>
                         <small class="text-muted d-block mt-3">Укажите город, где будет проходить съемка/проект</small>
                     </div>
 
-                    <!-- Шаг 11: Детали проекта -->
-                    <div class="form-step" data-step="11">
+                    <!-- Шаг 13: Детали проекта -->
+                    <div class="form-step" data-step="13">
                         <h3 class="mb-4">Дополнительная информация о проекте</h3>
                         <textarea class="form-control form-control-lg" name="project_description" rows="5" 
                                   placeholder="Опишите ваш проект: дата съемки, локация, бюджет, особые требования..." required></textarea>
                         <small class="text-muted d-block mt-2">Чем подробнее описание, тем точнее мы подберем модель</small>
                     </div>
 
-                    <!-- Шаг 12: Контактная информация -->
-                    <div class="form-step" data-step="12">
+                    <!-- Шаг 14: Контактная информация -->
+                    <div class="form-step" data-step="14">
                         <h3 class="mb-4">Ваши контактные данные</h3>
                         
                         <div class="mb-3">

@@ -19,22 +19,23 @@ return new class extends Migration
 
         Schema::create('blog_posts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('blog_categories')->onDelete('cascade');
+            $table->foreignId('category_id')->nullable()->constrained('blog_categories')->onDelete('set null');
             $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
             
             $table->string('title');
             $table->string('slug')->unique();
-            $table->text('excerpt');
+            $table->text('excerpt')->nullable();
             $table->longText('content');
             
             $table->string('featured_image')->nullable();
             $table->json('gallery_images')->nullable();
             
             $table->json('tags')->nullable();
+            $table->string('meta_title', 70)->nullable();
             $table->json('meta_keywords')->nullable();
-            $table->string('meta_description')->nullable();
+            $table->string('meta_description', 160)->nullable();
             
-            $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
+            $table->enum('status', ['draft', 'pending', 'published', 'archived'])->default('draft');
             $table->timestamp('published_at')->nullable();
             
             $table->integer('views_count')->default(0);

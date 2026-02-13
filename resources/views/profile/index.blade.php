@@ -143,16 +143,20 @@
 
                     <div class="row g-4">
                         <div class="col-md-4">
+                            <div class="rounded" style="background: #f8f9fa; padding: 10px;">
                             @if($model && $model->photos && count($model->photos) > 0)
                                 <img src="{{ asset('storage/' . $model->photos[0]) }}" 
-                                     class="img-fluid" 
-                                     alt="Фото профиля">
+                                     class="img-fluid rounded" 
+                                     alt="Фото профиля"
+                                     style="aspect-ratio: 2/3; object-fit: cover;">
+                                     style="width: 100%; height: auto; display: block;">
                             @else
                                 <img src="{{ asset('imgsite/placeholder.svg') }}" 
-                                     class="img-fluid" 
+                                     class="img-fluid rounded" 
                                      alt="Фото отсутствует"
-                                     style="aspect-ratio: 3/4; object-fit: cover;">
+                                     style="width: 100%; height: 300px; object-fit: contain;">
                             @endif
+                            </div>
                         </div>
                         <div class="col-md-8">
                             <h3 class="mb-3">{{ $model ? $model->full_name : Auth::user()->name }}</h3>
@@ -382,9 +386,11 @@
                         @foreach($model->photos as $index => $photo)
                         <div class="col-md-4">
                             <div class="position-relative">
+                                <div class="rounded" style="background: #f8f9fa; padding: 5px;">
                                 <img src="{{ asset('storage/' . $photo) }}" 
-                                     class="img-fluid" 
-                                     style="aspect-ratio: 3/4; object-fit: cover;">
+                                     class="img-fluid rounded" 
+                                     style="width: 100%; height: auto; display: block;">
+                                </div>
                                 <form action="{{ route('profile.delete-photo', $index) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')

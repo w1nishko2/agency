@@ -1,13 +1,30 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-Dl_QreDX.css",
+    "file": "assets/app-CYLO2WoR.css",
     "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/inline-editor.css": {
+    "file": "assets/inline-editor-CNHemDVL.css",
+    "src": "resources/css/inline-editor.css",
     "isEntry": true
   },
   "resources/js/app.js": {
     "file": "assets/app-DtNBvg3i.js",
     "name": "app",
     "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/inline-editor.js": {
+    "file": "assets/inline-editor-2dveG7nd.js",
+    "name": "inline-editor",
+    "src": "resources/js/inline-editor.js",
+    "isEntry": true
+  },
+  "resources/js/load-saved-content.js": {
+    "file": "assets/load-saved-content-7y0FBIKy.js",
+    "name": "load-saved-content",
+    "src": "resources/js/load-saved-content.js",
     "isEntry": true
   }
 }

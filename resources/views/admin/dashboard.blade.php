@@ -105,10 +105,10 @@
                             <div class="d-flex align-items-center">
                                 @if($model->main_photo && \Storage::disk('public')->exists($model->main_photo))
                                     <img src="{{ asset('storage/' . $model->main_photo) }}" alt="{{ $model->full_name }}" 
-                                         class="rounded me-3" style="width: 45px; height: 60px; object-fit: cover;"
+                                         class="rounded me-3" style="width: 45px; height: 67.5px; object-fit: cover;"
                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                     <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center" 
-                                         style="width: 45px; height: 60px; display: none;">
+                                         style="width: 45px; height: 67.5px; display: none;">
                                         <i class="bi bi-person text-white"></i>
                                     </div>
                                 @else

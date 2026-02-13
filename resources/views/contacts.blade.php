@@ -4,7 +4,7 @@
 @section('description', 'Свяжитесь с модельным агентством Golden Models. Телефон, email, адрес офиса в Москве.')
 
 @section('content')
-
+<div data-page-id="{{ $contactsPage->id ?? '' }}">
 <!-- Hero -->
 <section class="py-5" style="background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('{{ asset('imgsite/photo/photo_7_2026-01-24_11-43-44.webp') }}') center/cover;">
     <div class="container text-center">
@@ -23,68 +23,97 @@
                 <h3 class="mb-4">Наши контакты</h3>
                 
                 <div class="mb-4">
+                    @if($site_settings['contact']['contact_address'] ?? '')
                     <div class="d-flex align-items-start mb-3">
                         <i class="bi bi-geo-alt fs-4 me-3"></i>
                         <div>
-                            <h6 class="mb-1">Адрес</h6>
+                            <h6 class="mb-1">Адрес кастингов</h6>
                             <p class="text-muted mb-0">
-                                Москва, ул. Примерная, д. 1, офис 101<br>
-                                Метро "Примерная"
+                                {{ $site_settings['contact']['contact_address'] }}
                             </p>
                         </div>
                     </div>
+                    @endif
                     
+                    @if($site_settings['contact']['contact_phone'] ?? '')
                     <div class="d-flex align-items-start mb-3">
                         <i class="bi bi-telephone fs-4 me-3"></i>
                         <div>
                             <h6 class="mb-1">Телефон</h6>
                             <p class="text-muted mb-0">
-                                <a href="tel:+79991234567" class="text-decoration-none text-dark">+7 (999) 123-45-67</a><br>
-                                Ежедневно с 10:00 до 20:00
+                                <a href="tel:{{ str_replace([' ', '-', '(', ')'], '', $site_settings['contact']['contact_phone']) }}" class="text-decoration-none text-dark">{{ $site_settings['contact']['contact_phone'] }}</a><br>
+                                Иванова Надежда - кастинг директор (по работе с клиентами)
                             </p>
                         </div>
                     </div>
+                    @endif
                     
+                    @if($site_settings['contact']['contact_email'] ?? '')
                     <div class="d-flex align-items-start mb-3">
                         <i class="bi bi-envelope fs-4 me-3"></i>
                         <div>
-                            <h6 class="mb-1">Email</h6>
+                            <h6 class="mb-1">Email для клиентов</h6>
                             <p class="text-muted mb-0">
-                                <a href="mailto:info@golden-models.ru" class="text-decoration-none text-dark">info@golden-models.ru</a><br>
-                                Ответим в течение 24 часов
+                                <a href="mailto:{{ $site_settings['contact']['contact_email'] }}" class="text-decoration-none text-dark">{{ $site_settings['contact']['contact_email'] }}</a><br>
+                                Иванова Надежда - кастинг директор
                             </p>
                         </div>
                     </div>
+                    @endif
                     
+                    @if($site_settings['contact']['contact_email_models'] ?? '')
                     <div class="d-flex align-items-start mb-3">
-                        <i class="bi bi-telegram fs-4 me-3"></i>
+                        <i class="bi bi-envelope fs-4 me-3"></i>
                         <div>
-                            <h6 class="mb-1">Telegram</h6>
+                            <h6 class="mb-1">Email для моделей</h6>
                             <p class="text-muted mb-0">
-                                <a href="https://t.me/goldenmodels" class="text-decoration-none text-dark">@goldenmodels</a><br>
-                                Быстрый ответ в мессенджере
+                                <a href="mailto:{{ $site_settings['contact']['contact_email_models'] }}" class="text-decoration-none text-dark">{{ $site_settings['contact']['contact_email_models'] }}</a><br>
+                                Отдел по работе с моделями
                             </p>
                         </div>
                     </div>
+                    @endif
+                    
+                    @if($site_settings['contact']['contact_phone_partners'] ?? '')
+                    <div class="d-flex align-items-start mb-3">
+                        <i class="bi bi-telephone fs-4 me-3"></i>
+                        <div>
+                            <h6 class="mb-1">Сотрудничество и реклама</h6>
+                            <p class="text-muted mb-0">
+                                <a href="tel:{{ str_replace([' ', '-', '(', ')'], '', $site_settings['contact']['contact_phone_partners']) }}" class="text-decoration-none text-dark">{{ $site_settings['contact']['contact_phone_partners'] }}</a><br>
+                                Отдел сотрудничества и рекламы
+                            </p>
+                        </div>
+                    </div>
+                    @endif
                 </div>
 
                 <div class="mb-4">
                     <h6 class="mb-3">Социальные сети</h6>
                     <div class="social-links">
-                        <a href="https://vk.com" target="_blank" class="text-dark">
+                        @if($site_settings['social']['social_vk'] ?? '')
+                        <a href="{{ $site_settings['social']['social_vk'] }}" target="_blank" class="text-dark">
                             <i class="bi bi-globe"></i>
                         </a>
-                        <a href="https://t.me" target="_blank" class="text-dark">
+                        @endif
+                        @if($site_settings['social']['social_telegram'] ?? '')
+                        <a href="{{ $site_settings['social']['social_telegram'] }}" target="_blank" class="text-dark">
                             <i class="bi bi-telegram"></i>
                         </a>
-                        <a href="https://facebook.com" target="_blank" class="text-dark">
+                        @endif
+                        @if($site_settings['social']['social_facebook'] ?? '')
+                        <a href="{{ $site_settings['social']['social_facebook'] }}" target="_blank" class="text-dark">
                             <i class="bi bi-facebook"></i>
                         </a>
+                        @endif
                     </div>
                 </div>
 
                 <div class="p-4 bg-light">
                     <h6 class="mb-3">Режим работы</h6>
+                    @if($site_settings['contact']['contact_working_hours'] ?? '')
+                        <p class="text-muted mb-0">{{ $site_settings['contact']['contact_working_hours'] }}</p>
+                    @else
                     <div class="row small">
                         <div class="col-6 mb-2">
                             <strong>Пн-Пт:</strong>
@@ -99,6 +128,7 @@
                             11:00 - 18:00
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
 
@@ -168,5 +198,5 @@
         </div>
     </div>
 </section>
-
+</div>
 @endsection

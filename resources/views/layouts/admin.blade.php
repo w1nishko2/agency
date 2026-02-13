@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Админ панель') - Golden Models</title>
     
     <!-- Bootstrap CSS -->
@@ -344,6 +345,20 @@
                 <span>Блог</span>
             </a>
             
+            <a href="{{ route('admin.pages.index') }}" class="sidebar-link {{ request()->routeIs('admin.pages.*') ? 'active' : '' }}">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Страницы сайта</span>
+            </a>
+            
+            <div class="menu-section">
+                <div class="menu-section-title">Настройки</div>
+            </div>
+            
+            <a href="{{ route('admin.settings.index') }}" class="sidebar-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                <i class="bi bi-gear"></i>
+                <span>Контакты и настройки</span>
+            </a>
+            
             <div class="menu-section">
                 <div class="menu-section-title">Система</div>
             </div>
@@ -441,5 +456,6 @@
     </script>
     
     @stack('scripts')
+    @yield('scripts')
 </body>
 </html>

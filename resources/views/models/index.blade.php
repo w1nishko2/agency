@@ -6,7 +6,7 @@
 @section('content')
 
 <!-- Hero блок -->
-<section class="py-5" style="background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('{{ asset('imgsite/photo/photo_4_2026-01-24_11-43-44.webp') }}') center/cover;">
+<section class="py-5">
     <div class="container">
         <h1 class="mb-3">КАТАЛОГ МОДЕЛЕЙ</h1>
         <p class="lead text-muted">Найдите идеальную модель для вашего проекта</p>
@@ -59,10 +59,10 @@
                             <label class="form-label small text-uppercase">Возраст</label>
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <input type="number" class="form-control" name="age_from" placeholder="От" min="0" max="100">
+                                    <input type="number" class="form-control" name="age_from" placeholder="От">
                                 </div>
                                 <div class="col-6">
-                                    <input type="number" class="form-control" name="age_to" placeholder="До" min="0" max="100">
+                                    <input type="number" class="form-control" name="age_to" placeholder="До">
                                 </div>
                             </div>
                         </div>
@@ -83,14 +83,16 @@
                         <!-- Размер одежды -->
                         <div class="mb-4">
                             <label class="form-label small text-uppercase">Размер одежды</label>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <input type="number" class="form-control" name="clothing_size_from" placeholder="От" min="38" max="60">
-                                </div>
-                                <div class="col-6">
-                                    <input type="number" class="form-control" name="clothing_size_to" placeholder="До" min="38" max="60">
-                                </div>
-                            </div>
+                            <select class="form-select" name="clothing_size">
+                                <option value="">Любой</option>
+                                <option value="XS">XS</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                                <option value="XXXL">XXXL</option>
+                            </select>
                         </div>
 
                         <!-- Размер обуви -->
@@ -111,19 +113,11 @@
                             <label class="form-label small text-uppercase">Типаж внешности</label>
                             <select class="form-select" name="appearance_type">
                                 <option value="">Любой</option>
-                                <option value="славянский">Славянский</option>
-                                <option value="европейский">Европейский</option>
-                                <option value="скандинавский">Скандинавский</option>
-                                <option value="средиземноморский">Средиземноморский</option>
-                                <option value="азиатский">Азиатский</option>
-                                <option value="восточный">Восточный</option>
-                                <option value="афро">Афро</option>
-                                <option value="афроамериканский">Афроамериканский</option>
-                                <option value="латино">Латино</option>
-                                <option value="индийский">Индийский</option>
-                                <option value="арабский">Арабский</option>
-                                <option value="смешанный">Смешанный</option>
-                                <option value="экзотический">Экзотический</option>
+                                <option value="Славянский">Славянский</option>
+                                <option value="Европейский">Европейский</option>
+                                <option value="Азиатский">Азиатский</option>
+                                <option value="Афро">Афро</option>
+                                <option value="Мулат">Мулат</option>
                             </select>
                         </div>
 
@@ -191,23 +185,12 @@
                             <label class="form-label small text-uppercase">Знание языков</label>
                             <select class="form-select" name="languages">
                                 <option value="">Не важно</option>
-                                <option value="ru">Русский</option>
-                                <option value="en">Английский</option>
-                                <option value="de">Немецкий</option>
-                                <option value="fr">Французский</option>
-                                <option value="es">Испанский</option>
-                                <option value="it">Итальянский</option>
-                                <option value="pt">Португальский</option>
-                                <option value="zh">Китайский</option>
-                                <option value="ja">Японский</option>
-                                <option value="ko">Корейский</option>
-                                <option value="ar">Арабский</option>
-                                <option value="tr">Турецкий</option>
-                                <option value="pl">Польский</option>
-                                <option value="nl">Голландский</option>
-                                <option value="sv">Шведский</option>
-                                <option value="no">Норвежский</option>
-                                <option value="fi">Финский</option>
+                                <option value="Английский">Английский</option>
+                                <option value="Немецкий">Немецкий</option>
+                                <option value="Французский">Французский</option>
+                                <option value="Испанский">Испанский</option>
+                                <option value="Итальянский">Итальянский</option>
+                                <option value="Китайский">Китайский</option>
                             </select>
                         </div>
 
@@ -299,35 +282,26 @@
                     <div class="col-md-6 col-lg-4">
                         <a href="{{ route('models.show', $model->id) }}" class="text-decoration-none text-dark">
                             <div class="card h-100 shadow-sm">
-                                <div class="position-relative overflow-hidden">
+                                <div class="position-relative" style="background: #f8f9fa;">
                                     @if($model->photos && count($model->photos) > 0)
                                         <img src="{{ asset('storage/' . $model->photos[0]) }}" 
                                              class="card-img-top loaded" 
-                                             style="aspect-ratio: 3/4; object-fit: cover;"
+                                             style="width: 100%; aspect-ratio: 2/3; object-fit: cover;"
                                              alt="{{ $model->full_name }}"
                                              loading="lazy">
                                     @else
                                         <img src="{{ asset('imgsite/placeholder.svg') }}" 
                                              alt="Фото отсутствует" 
                                              class="card-img-top loaded"
-                                             style="aspect-ratio: 3/4; object-fit: cover;"
+                                             style="width: 100%; height: 300px; object-fit: contain;"
                                              loading="lazy">
                                     @endif
                                 </div>
                                 <div class="card-body">
-                                    <h5 class="card-title mb-2">{{ $model->full_name }}</h5>
-                                    <p class="text-muted small mb-2">
-                                        <i class="bi bi-geo-alt me-1"></i>{{ $model->city }}
-                                    </p>
-                                    <div class="d-flex gap-2 flex-wrap small text-muted">
-                                        <span>{{ $model->age }} {{ $model->age == 1 ? 'год' : ($model->age < 5 ? 'года' : 'лет') }}</span>
-                                        <span>•</span>
-                                        <span>{{ $model->height }} см</span>
-                                        @if($model->eye_color)
-                                        <span>•</span>
-                                        <span>{{ ucfirst($model->eye_color) }} глаза</span>
-                                        @endif
-                                    </div>
+                                    <h5 class="card-title mb-1">{{ $model->full_name }}</h5>
+                                    @if($model->model_number)
+                                    <p class="text-muted small mb-0">№ {{ $model->model_number }}</p>
+                                    @endif
                                 </div>
                             </div>
                         </a>
@@ -463,7 +437,7 @@
         
         const photoHtml = `<img src="${photoUrl}" 
                      class="card-img-top loaded" 
-                     style="aspect-ratio: 3/4; object-fit: cover;"
+                     style="height: 400px; object-fit: contain; background: #f8f9fa;"
                      alt="${modelName}"
                      loading="lazy">`;
         

@@ -25,7 +25,9 @@ Route::get('/', function () {
         ->limit(3)
         ->get();
     
-    return view('index', compact('latestPosts'));
+    $homePage = \App\Models\Page::where('slug', '')->where('is_active', true)->first();
+    
+    return view('index', compact('latestPosts', 'homePage'));
 })->name('home');
 
 // Модели
@@ -44,7 +46,8 @@ Route::get('/casting/thanks', [CastingController::class, 'thanks'])->name('casti
 
 // О нас
 Route::get('/about', function () {
-    return view('about');
+    $aboutPage = \App\Models\Page::where('slug', 'about')->where('is_active', true)->first();
+    return view('about', compact('aboutPage'));
 })->name('about');
 
 // Блог
@@ -53,7 +56,8 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // Контакты
 Route::get('/contacts', function () {
-    return view('contacts');
+    $contactsPage = \App\Models\Page::where('slug', 'contacts')->where('is_active', true)->first();
+    return view('contacts', compact('contactsPage'));
 })->name('contacts');
 
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
@@ -92,6 +96,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/models/{id}/deactivate', [\App\Http\Controllers\Admin\ModelAdminController::class, 'deactivate'])->name('models.deactivate');
     Route::get('/models/{id}/edit', [\App\Http\Controllers\Admin\ModelAdminController::class, 'edit'])->name('models.edit');
     Route::put('/models/{id}', [\App\Http\Controllers\Admin\ModelAdminController::class, 'update'])->name('models.update');
+    Route::post('/models/{id}/upload-photos', [\App\Http\Controllers\Admin\ModelAdminController::class, 'uploadPhotos'])->name('models.upload-photos');
+    Route::post('/models/{id}/crop-photo', [\App\Http\Controllers\Admin\ModelAdminController::class, 'cropPhoto'])->name('models.crop-photo');
     Route::delete('/models/{id}', [\App\Http\Controllers\Admin\ModelAdminController::class, 'destroy'])->name('models.destroy');
     
     // Кастинги
@@ -127,7 +133,38 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/telegram-bot/webhook', [\App\Http\Controllers\Admin\TelegramBotController::class, 'setWebhook'])->name('telegram-bot.webhook.set');
     Route::delete('/telegram-bot/webhook', [\App\Http\Controllers\Admin\TelegramBotController::class, 'deleteWebhook'])->name('telegram-bot.webhook.delete');
     Route::get('/telegram-bot/webhook/info', [\App\Http\Controllers\Admin\TelegramBotController::class, 'getWebhookInfo'])->name('telegram-bot.webhook.info');
+    
+    // Управление страницами
+    Route::get('/pages', [\App\Http\Controllers\Admin\PageAdminController::class, 'index'])->name('pages.index');
+    Route::get('/pages/{id}/edit', [\App\Http\Controllers\Admin\PageAdminController::class, 'edit'])->name('pages.edit');
+    Route::put('/pages/{id}', [\App\Http\Controllers\Admin\PageAdminController::class, 'update'])->name('pages.update');
+    Route::post('/pages/{id}/crop-image', [\App\Http\Controllers\Admin\PageAdminController::class, 'cropImage'])->name('pages.crop-image');
+    Route::delete('/pages/{id}/image', [\App\Http\Controllers\Admin\PageAdminController::class, 'deleteImage'])->name('pages.delete-image');
+    
+    // Настройки сайта
+    Route::get('/settings', [\App\Http\Controllers\Admin\SettingsAdminController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [\App\Http\Controllers\Admin\SettingsAdminController::class, 'update'])->name('settings.update');
+    Route::delete('/settings/{key}/image', [\App\Http\Controllers\Admin\SettingsAdminController::class, 'deleteImage'])->name('settings.delete-image');
 });
+
+// Inline редактирование страниц (требует авторизации администратора)
+Route::middleware(['inline.edit'])->group(function () {
+    // Главная страница (пустой slug)
+    Route::get('/pages/home/inline-edit', [\App\Http\Controllers\InlineEditController::class, 'showPage'])->defaults('slug', '')->name('pages.inline-edit.home');
+    // Остальные страницы
+    Route::get('/pages/{slug}/inline-edit', [\App\Http\Controllers\InlineEditController::class, 'showPage'])->name('pages.inline-edit');
+    Route::post('/api/inline-edit/update', [\App\Http\Controllers\InlineEditController::class, 'updateContent'])->name('api.inline-edit.update');
+    Route::get('/api/inline-edit/content/{pageId}', [\App\Http\Controllers\InlineEditController::class, 'getPageContent'])->name('api.inline-edit.content');
+});
+
+// Публичный API для загрузки сохраненного контента
+Route::get('/api/pages/{pageId}/content', [\App\Http\Controllers\InlineEditController::class, 'getPublicPageContent'])->name('api.pages.content');
+
+// Динамические страницы (services, terms, faq и другие) - ДОЛЖЕН БЫТЬ В КОНЦЕ!
+Route::get('/{slug}', function ($slug) {
+    $page = \App\Models\Page::where('slug', $slug)->where('is_active', true)->firstOrFail();
+    return view('page', compact('page'));
+})->where('slug', '[a-z0-9-]+')->name('page.show');
 
 if (app()->environment('production')) {
     URL::forceScheme('https');

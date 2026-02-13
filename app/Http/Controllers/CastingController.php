@@ -24,6 +24,8 @@ class CastingController extends Controller
             'clothing_size' => 'required|string',
             'hair_color' => 'required|string',
             'eye_color' => 'required|string',
+            'appearance_type' => 'required|string',
+            'languages' => 'nullable|string',
             'bust' => 'nullable|integer',
             'waist' => 'nullable|integer',
             'hips' => 'nullable|integer',
@@ -52,6 +54,11 @@ class CastingController extends Controller
         $description .= "Размер одежды: {$validated['clothing_size']}\n";
         $description .= "Цвет волос: {$validated['hair_color']}\n";
         $description .= "Цвет глаз: {$validated['eye_color']}\n";
+        $description .= "Тип внешности: {$validated['appearance_type']}\n";
+        
+        if (!empty($validated['languages'])) {
+            $description .= "Требуется знание языка: {$validated['languages']}\n";
+        }
         
         // Параметры фигуры
         if ($validated['bust'] || $validated['waist'] || $validated['hips']) {

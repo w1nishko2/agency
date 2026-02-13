@@ -178,10 +178,12 @@
                         </div>
                         
                         @if($model->main_photo && Storage::disk('public')->exists($model->main_photo))
+                            <div style="background: #f8f9fa;">
                             <img src="{{ asset('storage/' . $model->main_photo) }}" 
                                  class="card-img-top" 
-                                 style="height: 300px; object-fit: cover;"
+                                 style="width: 100%; height: auto; object-fit: contain;"
                                  alt="{{ $model->full_name }}">
+                            </div>
                         @else
                             <div class="bg-light d-flex align-items-center justify-content-center" 
                                  style="height: 300px;">

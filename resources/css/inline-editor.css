@@ -1,0 +1,456 @@
+/**
+ * Стили для системы inline-редактирования контента
+ */
+
+/* Панель инструментов */
+#inline-edit-toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 12px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.inline-toolbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toolbar-icon {
+    font-size: 24px;
+}
+
+.toolbar-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.toolbar-hint {
+    font-size: 13px;
+    opacity: 0.8;
+    margin-left: 15px;
+    font-weight: 400;
+}
+
+.toolbar-right {
+    display: flex;
+    gap: 10px;
+}
+
+.toolbar-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.toolbar-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.toolbar-btn-exit {
+    background: rgba(239, 68, 68, 0.8);
+    border-color: rgba(239, 68, 68, 0.9);
+}
+
+.toolbar-btn-exit:hover {
+    background: rgba(239, 68, 68, 1);
+}
+
+/* Оверлей для подсветки элементов */
+#inline-edit-overlay {
+    position: absolute;
+    border: 2px dashed #2a5298;
+    background: rgba(42, 82, 152, 0.1);
+    pointer-events: none;
+    z-index: 9998;
+    display: none;
+    transition: all 0.1s ease;
+}
+
+/* Редактируемые элементы */
+.inline-editable {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.inline-editable:hover {
+    background: rgba(42, 82, 152, 0.05);
+}
+
+.inline-editing {
+    background: #fff9e6 !important;
+    color: #212529 !important;
+    outline: 2px solid #2a5298;
+    outline-offset: 2px;
+    border-radius: 4px;
+    padding: 8px;
+    min-height: 30px;
+    cursor: text !important;
+}
+
+.inline-editing:focus {
+    outline: 2px solid #1e3c72;
+    color: #212529 !important;
+}
+
+/* Принудительно устанавливаем цвет текста для contenteditable элементов */
+[contenteditable="true"] {
+    color: #212529 !important;
+    -webkit-text-fill-color: #212529 !important;
+}
+
+.inline-editing * {
+    color: inherit !important;
+}
+
+/* Панель редактирования */
+#inline-edit-panel {
+    position: absolute;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    display: flex;
+    gap: 8px;
+    z-index: 10000;
+    animation: fadeInUp 0.2s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.edit-panel-btn {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.edit-panel-save {
+    background: #10b981;
+    color: white;
+}
+
+.edit-panel-save:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.edit-panel-save:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.edit-panel-cancel {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.edit-panel-cancel:hover {
+    background: #e5e7eb;
+}
+
+/* Уведомления */
+.inline-notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: white;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10001;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease-out;
+}
+
+.inline-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.inline-notification-success {
+    border-left: 4px solid #10b981;
+}
+
+.inline-notification-success i {
+    color: #10b981;
+    font-size: 20px;
+}
+
+.inline-notification-error {
+    border-left: 4px solid #ef4444;
+}
+
+.inline-notification-error i {
+    color: #ef4444;
+    font-size: 20px;
+}
+
+/* Приветственное сообщение */
+#inline-welcome-message {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: white;
+    padding: 24px 32px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    z-index: 10001;
+    opacity: 0;
+    transition: all 0.3s ease-out;
+    max-width: 500px;
+}
+
+#inline-welcome-message.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.welcome-content h4 {
+    margin: 0 0 12px 0;
+    color: #1f2937;
+    font-size: 18px;
+}
+
+.welcome-content p {
+    margin: 0 0 16px 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.btn-close-welcome {
+    background: #2a5298;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-close-welcome:hover {
+    background: #1e3c72;
+}
+
+/* Модальное окно помощи */
+#inline-help-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#inline-help-modal.show {
+    opacity: 1;
+}
+
+.help-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.help-content {
+    position: relative;
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    z-index: 1;
+}
+
+.help-content h3 {
+    margin: 0 0 20px 0;
+    color: #1f2937;
+    font-size: 24px;
+}
+
+.help-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px 0;
+}
+
+.help-content li {
+    padding: 12px 0;
+    color: #4b5563;
+    font-size: 15px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.help-content li:last-child {
+    border-bottom: none;
+}
+
+.btn-close-help {
+    background: #2a5298;
+    color: white;
+    border: none;
+    padding: 10px 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.btn-close-help:hover {
+    background: #1e3c72;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    #inline-edit-toolbar {
+        padding: 10px 15px;
+    }
+
+    .toolbar-title {
+        font-size: 14px;
+    }
+
+    .toolbar-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    #inline-welcome-message {
+        max-width: 90%;
+        padding: 20px;
+    }
+
+    .help-content {
+        max-width: 90%;
+        padding: 24px;
+    }
+
+    .inline-notification {
+        right: 10px;
+        left: 10px;
+    }
+}
+
+/* Добавляем отступ сверху для контента страницы в режиме редактирования */
+body[data-inline-edit="true"] {
+    padding-top: 60px;
+}
+
+/* Стили для контентной области с HTML */
+.content-area {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.content-area h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+}
+
+.content-area h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #374151;
+}
+
+.content-area p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+}
+
+.content-area ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 2rem;
+}
+
+.content-area ul li {
+    position: relative;
+    padding-left: 2rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.05rem;
+    color: #4b5563;
+}
+
+.content-area ul li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #2a5298;
+    font-weight: bold;
+    font-size: 1.2rem;
+}

@@ -45,13 +45,9 @@ class ModelsController extends Controller
             $query->where('height', '<=', $request->height_to);
         }
 
-        // Размер одежды (от/до)
-        if ($request->filled('clothing_size_from')) {
-            $query->where('clothing_size_numeric', '>=', $request->clothing_size_from);
-        }
-
-        if ($request->filled('clothing_size_to')) {
-            $query->where('clothing_size_numeric', '<=', $request->clothing_size_to);
+        // Размер одежды
+        if ($request->filled('clothing_size')) {
+            $query->where('clothing_size', $request->clothing_size);
         }
 
         // Размер обуви (от/до)
@@ -76,46 +72,35 @@ class ModelsController extends Controller
         if ($request->filled('eye_color')) {
             $query->where('eye_color', $request->eye_color);
         }
-
         if ($request->filled('hair_color')) {
             $query->where('hair_color', $request->hair_color);
         }
-
         // Знание языков
         if ($request->filled('languages')) {
             $query->whereRaw('JSON_CONTAINS(languages, ?)', [json_encode($request->languages)]);
         }
-
         // Дополнительные критерии (чекбоксы)
         if ($request->has('has_snaps')) {
             $query->where('has_snaps', true);
         }
-
         if ($request->has('has_video_presentation')) {
             $query->where('has_video_presentation', true);
         }
-
         if ($request->has('has_video_walk')) {
             $query->where('has_video_walk', true);
         }
-
         if ($request->has('has_passport')) {
             $query->where('has_passport', true);
         }
-
         if ($request->has('has_professional_experience')) {
             $query->where('has_professional_experience', true);
         }
-
         if ($request->has('has_tattoos')) {
             $query->where('has_tattoos', true);
         }
-
         if ($request->has('has_piercings')) {
             $query->where('has_piercings', true);
         }
-
-        // Сортировка
         $sort = $request->get('sort', 'new');
         switch ($sort) {
             case 'popular':
@@ -124,14 +109,11 @@ class ModelsController extends Controller
             case 'name':
                 $query->orderBy('first_name', 'asc');
                 break;
-            default: // 'new'
+            default: 
                 $query->orderBy('created_at', 'desc');
                 break;
         }
-
         $models = $query->paginate(12);
-
-        // Для AJAX запросов возвращаем JSON
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'models' => $models->items(),
@@ -140,10 +122,8 @@ class ModelsController extends Controller
                 'total' => $models->total(),
             ]);
         }
-
         return view('models.index', compact('models'));
     }
-
     public function show($id)
     {
         // Валидация ID
@@ -175,30 +155,75 @@ class ModelsController extends Controller
     public function registerSubmit(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'nullable|string|max:255',
-            'surname' => 'nullable|string|max:255',
-            'email' => 'nullable|email|unique:models,email',
-            'phone' => 'nullable|string',
-            'birth_date' => 'nullable|date',
-            'gender' => 'nullable|in:female,male',
-            'city' => 'nullable|string',
+            'name' => 'required|string|max:255',
+            'surname' => 'required|string|max:255',
+            'email' => 'required|email|unique:models,email',
+            'phone' => 'required|string',
+            'birth_date' => 'required|date|before:today',
+            'gender' => 'required|in:female,male',
+            'city' => 'required|string',
             'country' => 'nullable|string',
-            'height' => 'nullable|numeric',
-            'weight' => 'nullable|numeric',
-            'eye_color' => 'nullable|string',
-            'hair_color' => 'nullable|string',
-            'bust' => 'nullable|numeric',
-            'waist' => 'nullable|numeric',
-            'hips' => 'nullable|numeric',
-            'shoe_size' => 'nullable|numeric',
+            'height' => 'required|numeric|min:140|max:220',
+            'weight' => 'required|numeric|min:40|max:150',
+            'eye_color' => 'required|string',
+            'hair_color' => 'required|string',
+            'bust' => 'required|numeric|min:60|max:150',
+            'waist' => 'required|numeric|min:50|max:120',
+            'hips' => 'required|numeric|min:60|max:150',
+            'shoe_size' => 'required|numeric|min:33|max:46',
+            'clothing_size' => 'required|string|in:XS,S,M,L,XL,XXL,XXXL',
+            'appearance_type' => 'required|string|in:Славянский,Европейский,Азиатский,Афро,Мулат',
             'vk' => 'nullable|string',
             'telegram' => 'nullable|string',
             'facebook' => 'nullable|string',
             'experience' => 'nullable|string',
             'catwalk_skills' => 'nullable|string',
             'posing_skills' => 'nullable|string',
-            'photos' => 'nullable|array',
-            'photos.*' => 'nullable|file',
+            'languages' => 'nullable|array',
+            'languages.*.enabled' => 'nullable|boolean',
+            'languages.*.level' => 'nullable|string|in:Начальный,Разговорный,Переводчик',
+            'photos' => 'required|array|min:1|max:10',
+            'photos.*' => 'required|file|image|max:10240',
+            'agree' => 'required|accepted',
+        ], [
+            'name.required' => 'Укажите имя',
+            'surname.required' => 'Укажите фамилию',
+            'email.required' => 'Укажите email',
+            'email.email' => 'Некорректный формат email',
+            'email.unique' => 'Модель с таким email уже зарегистрирована',
+            'phone.required' => 'Укажите телефон',
+            'birth_date.required' => 'Укажите дату рождения',
+            'gender.required' => 'Укажите пол',
+            'city.required' => 'Укажите город',
+            'height.required' => 'Укажите рост',
+            'height.min' => 'Рост должен быть не менее 140 см',
+            'height.max' => 'Рост должен быть не более 220 см',
+            'weight.required' => 'Укажите вес',
+            'weight.min' => 'Вес должен быть не менее 40 кг',
+            'weight.max' => 'Вес должен быть не более 150 кг',
+            'eye_color.required' => 'Укажите цвет глаз',
+            'hair_color.required' => 'Укажите цвет волос',
+            'bust.required' => 'Укажите объем груди',
+            'bust.min' => 'Объем груди должен быть не менее 60 см',
+            'bust.max' => 'Объем груди должен быть не более 150 см',
+            'waist.required' => 'Укажите объем талии',
+            'waist.min' => 'Объем талии должен быть не менее 50 см',
+            'waist.max' => 'Объем талии должен быть не более 120 см',
+            'hips.required' => 'Укажите объем бедер',
+            'hips.min' => 'Объем бедер должен быть не менее 60 см',
+            'hips.max' => 'Объем бедер должен быть не более 150 см',
+            'shoe_size.required' => 'Укажите размер обуви',
+            'shoe_size.min' => 'Размер обуви должен быть не менее 33',
+            'shoe_size.max' => 'Размер обуви должен быть не более 46',
+            'clothing_size.required' => 'Укажите размер одежды',
+            'appearance_type.required' => 'Укажите тип внешности',
+            'photos.required' => 'Загрузите хотя бы одну фотографию',
+            'photos.min' => 'Загрузите хотя бы одну фотографию',
+            'photos.max' => 'Можно загрузить не более 10 фотографий',
+            'photos.*.image' => 'Все файлы должны быть изображениями',
+            'photos.*.max' => 'Размер каждого файла не должен превышать 10 МБ',
+            'agree.required' => 'Необходимо согласие на обработку персональных данных',
+            'agree.accepted' => 'Необходимо согласие на обработку персональных данных',
         ]);
 
         // Загрузка и обработка фотографий
@@ -268,6 +293,34 @@ class ModelsController extends Controller
             $validated['last_name'] = time(); // Уникальная фамилия
         }
 
+        // Обработка языков
+        $languagesData = [];
+        if (isset($validated['languages']) && is_array($validated['languages'])) {
+            foreach ($validated['languages'] as $langKey => $langData) {
+                if (isset($langData['enabled']) && $langData['enabled'] && isset($langData['level']) && $langData['level']) {
+                    $languagesData[] = [
+                        'language' => $langKey,
+                        'level' => $langData['level']
+                    ];
+                }
+            }
+        }
+        $validated['languages'] = $languagesData;
+
+        // Вычисление clothing_size_numeric для фильтрации
+        if (isset($validated['clothing_size'])) {
+            $sizeMap = [
+                'XS' => 40,
+                'S' => 42,
+                'M' => 44,
+                'L' => 46,
+                'XL' => 48,
+                'XXL' => 50,
+                'XXXL' => 52
+            ];
+            $validated['clothing_size_numeric'] = $sizeMap[$validated['clothing_size']] ?? 44;
+        }
+
         // Значения по умолчанию для обязательных полей
         $validated['gender'] = $validated['gender'] ?? 'female';
         $validated['city'] = $validated['city'] ?? 'Не указан';
@@ -293,6 +346,12 @@ class ModelsController extends Controller
         if (auth()->check()) {
             $validated['user_id'] = auth()->id();
             $model = ModelProfile::create($validated);
+            
+            // Генерируем model_number если его нет
+            if (!$model->model_number) {
+                $model->model_number = 'GM' . str_pad($model->id, 5, '0', STR_PAD_LEFT);
+                $model->save();
+            }
             
             return redirect()->route('profile')->with('success', 'Ваша анкета модели создана и отправлена на модерацию!');
         } else {

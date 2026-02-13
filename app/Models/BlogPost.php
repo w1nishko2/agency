@@ -20,6 +20,7 @@ class BlogPost extends Model
         'featured_image',
         'gallery_images',
         'tags',
+        'meta_title',
         'meta_keywords',
         'meta_description',
         'status',

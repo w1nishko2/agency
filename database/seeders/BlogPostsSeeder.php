@@ -16,6 +16,9 @@ class BlogPostsSeeder extends Seeder
      */
     public function run(): void
     {
+        // Очищаем таблицу статей перед добавлением новых (включая soft deleted)
+        BlogPost::withTrashed()->forceDelete();
+        
         // Создаем категории если их нет
         $categories = [
             'Модельный бизнес' => 'modeling-business',

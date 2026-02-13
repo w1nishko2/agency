@@ -17,6 +17,20 @@
     </a>
 </div>
 
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+@if (session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
 <form action="{{ isset($post) ? route('admin.blog.update', $post->id) : route('admin.blog.store') }}" 
       method="POST" 
       enctype="multipart/form-data">
@@ -55,7 +69,7 @@
                                            name="slug" 
                                            value="{{ old('slug', $post->slug ?? '') }}" 
                                            required
-                                           pattern="[a-z0-9-]+"
+                                           pattern="[a-z0-9\-]+"
                                            maxlength="255">
                                     <small class="text-muted">Только латиница, цифры и дефис</small>
                                 </div>
@@ -74,11 +88,12 @@
                                 <!-- Основной текст -->
                                 <div class="mb-4">
                                     <label for="content" class="form-label">Содержание *</label>
-                                    <textarea class="form-control" 
-                                              id="content" 
-                                              name="content" 
-                                              rows="20" 
-                                              required>{{ old('content', $post->content ?? '') }}</textarea>
+                                    <input type="hidden" id="content" name="content">
+                                    <div id="editor" style="min-height: 400px; background: white; border: 1px solid #ced4da; border-radius: 0.25rem;"></div>
+                                    <small class="text-muted">Используйте панель инструментов для форматирования текста</small>
+                                    @error('content')
+                                        <div class="text-danger mt-1">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -304,8 +319,69 @@
 
 @endsection
 
+@push('styles')
+<!-- Quill CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    .ql-editor {
+        min-height: 350px;
+        font-size: 16px;
+    }
+    .ql-toolbar {
+        background: #f8f9fa;
+        border-radius: 0.25rem 0.25rem 0 0;
+    }
+</style>
+@endpush
+
 @push('scripts')
+<!-- Quill JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 <script>
+    // Инициализация Quill редактора
+    var quill = new Quill('#editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'align': [] }],
+                ['blockquote', 'code-block'],
+                ['link', 'image'],
+                [{ 'color': [] }, { 'background': [] }],
+                ['clean']
+            ]
+        },
+        placeholder: 'Начните писать статью...'
+    });
+
+    // Загрузка существующего контента
+    var existingContent = @json(old('content', $post->content ?? ''));
+    if (existingContent) {
+        quill.root.innerHTML = existingContent;
+    }
+
+    // Синхронизация с hidden полем при отправке формы
+    var form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        var content = quill.root.innerHTML;
+        document.getElementById('content').value = content;
+        
+        // Проверка что контент не пустой
+        if (!content || content.trim() === '<p><br></p>' || content.trim() === '') {
+            e.preventDefault();
+            alert('Пожалуйста, заполните содержание статьи');
+            return false;
+        }
+    });
+    
+    // Синхронизация при каждом изменении
+    quill.on('text-change', function() {
+        document.getElementById('content').value = quill.root.innerHTML;
+    });
+
     // Автоматическая генерация slug из заголовка
     document.getElementById('title').addEventListener('input', function() {
         const slug = document.getElementById('slug');

@@ -14,6 +14,7 @@ class ModelProfile extends Model
 
     protected $fillable = [
         'user_id',
+        'model_number',
         'first_name',
         'last_name',
         'email',

@@ -5,8 +5,20 @@
 
 @section('content')
 
+@if($homePage)
+<div data-page-id="{{ $homePage->id }}">
+@endif
+
 <!-- Hero Section -->
-<section class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('{{ asset('imgsite/photo/photo_1_2026-01-24_11-43-44.webp') }}') center/cover;">
+@php
+    $heroImage = 'imgsite/photo/photo_1_2026-01-24_11-43-44.webp';
+    if ($homePage && $homePage->image) {
+        $heroImageUrl = asset('storage/' . $homePage->image);
+    } else {
+        $heroImageUrl = asset($heroImage);
+    }
+@endphp
+<section class="hero-section" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('{{ $heroImageUrl }}') center/cover;">
     <div class="hero-overlay"></div>
     <div class="hero-content container">
         <h1 class="hero-title animate__animated animate__fadeInDown">GOLDEN MODELS</h1>
@@ -25,15 +37,29 @@
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <div class="position-relative rounded shadow overflow-hidden" style="height: 500px;">
                     @php
-                        $photos = [
-                            'photo_2_2026-01-24_11-43-44.webp',
-                            'photo_3_2026-01-24_11-43-44.webp',
-                            'photo_4_2026-01-24_11-43-44.webp',
-                            'photo_6_2026-01-24_11-43-44.webp',
-                        ];
+                        // Получаем изображения из базы или используем дефолтные
+                        $aboutImages = [];
+                        if ($homePage && $homePage->images) {
+                            for ($i = 1; $i <= 4; $i++) {
+                                $key = "about_image_{$i}";
+                                if (isset($homePage->images[$key])) {
+                                    $aboutImages[] = asset('storage/' . $homePage->images[$key]);
+                                }
+                            }
+                        }
+                        
+                        // Если нет изображений в базе, используем дефолтные
+                        if (empty($aboutImages)) {
+                            $aboutImages = [
+                                asset('imgsite/photo/photo_2_2026-01-24_11-43-44.webp'),
+                                asset('imgsite/photo/photo_3_2026-01-24_11-43-44.webp'),
+                                asset('imgsite/photo/photo_4_2026-01-24_11-43-44.webp'),
+                                asset('imgsite/photo/photo_6_2026-01-24_11-43-44.webp'),
+                            ];
+                        }
                     @endphp
-                    @foreach($photos as $index => $photo)
-                    <img src="{{ asset('imgsite/photo/' . $photo) }}" 
+                    @foreach($aboutImages as $index => $imageUrl)
+                    <img src="{{ $imageUrl }}" 
                          alt="Golden Models {{ $index + 1 }}" 
                          class="carousel-image position-absolute w-100 h-100"
                          style="object-fit: cover; opacity: {{ $index === 0 ? 1 : 0 }}; transition: opacity 1s ease-in-out;"
@@ -107,19 +133,21 @@
             <div class="col-md-6 col-lg-3">
                 <a href="{{ route('models.show', $model->id) }}" class="text-decoration-none">
                     <div class="card border-0 shadow-sm h-100">
+                        <div style="background: #f8f9fa;">
                         @if($model->photos && count($model->photos) > 0)
                             <img src="{{ asset('storage/' . $model->photos[0]) }}" 
                                  alt="{{ $model->full_name }}" 
                                  class="card-img-top"
-                                 style="aspect-ratio: 3/4; object-fit: cover;"
+                                 style="width: 100%; aspect-ratio: 2/3; object-fit: cover;"
                                  loading="lazy">
                         @else
                             <img src="{{ asset('imgsite/placeholder.svg') }}" 
                                  alt="Фото отсутствует" 
                                  class="card-img-top"
-                                 style="aspect-ratio: 3/4; object-fit: cover;"
+                                 style="width: 100%; height: 300px; object-fit: contain;"
                                  loading="lazy">
                         @endif
+                        </div>
                         <div class="card-body">
                             <h5 class="card-title mb-1">{{ $model->full_name }}</h5>
                             <p class="text-muted small mb-2">
@@ -341,22 +369,31 @@
                     
                     <div class="mb-3">
                         <i class="bi bi-geo-alt me-2"></i>
-                        <span>Москва, ул. Тверская, д. 1, офис 100</span>
+                        <span>Москва, м. Цветной Бульвар, ул. Цветной Бульвар, д.19 строение 5, 4 этаж</span>
                     </div>
                     
                     <div class="mb-3">
                         <i class="bi bi-telephone me-2"></i>
-                        <a href="tel:+79991234567" class="text-decoration-none text-dark">+7 (999) 123-45-67</a>
+                        <a href="tel:+79057173012" class="text-decoration-none text-dark">+7 905 717 30 12</a>
+                        <br><small class="text-muted">Иванова Надежда - кастинг директор</small>
                     </div>
                     
                     <div class="mb-3">
                         <i class="bi bi-envelope me-2"></i>
-                        <a href="mailto:info@golden-models.ru" class="text-decoration-none text-dark">info@golden-models.ru</a>
+                        <a href="mailto:gma@golden-models.ru" class="text-decoration-none text-dark">gma@golden-models.ru</a>
+                        <br><small class="text-muted">Для клиентов</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <i class="bi bi-envelope me-2"></i>
+                        <a href="mailto:casting@golden-models.ru" class="text-decoration-none text-dark">casting@golden-models.ru</a>
+                        <br><small class="text-muted">Для моделей</small>
                     </div>
                     
                     <div class="mb-4">
-                        <i class="bi bi-telegram me-2"></i>
-                        <a href="https://t.me/goldenmodels" class="text-decoration-none text-dark" target="_blank">@goldenmodels</a>
+                        <i class="bi bi-telephone me-2"></i>
+                        <a href="tel:+79067299717" class="text-decoration-none text-dark">+7 906 729 97 17</a>
+                        <br><small class="text-muted">Сотрудничество и реклама</small>
                     </div>
                     
                     <div class="social-links d-flex gap-3">
@@ -378,6 +415,10 @@
         </div>
     </div>
 </section>
+
+@if($homePage)
+</div>
+@endif
 
 @endsection
 
@@ -430,13 +471,13 @@
     
     function init() {
         var myMap = new ymaps.Map("map", {
-            center: [55.751574, 37.573856], // Координаты центра Москвы
+            center: [55.771899, 37.620393], // Цветной Бульвар, д.19 стр.5
             zoom: 16,
             controls: ['zoomControl', 'fullscreenControl']
         });
 
-        var myPlacemark = new ymaps.Placemark([55.751574, 37.573856], {
-            balloonContent: '<strong>Golden Models</strong><br>Москва, ул. Тверская, д. 1, офис 100<br><a href="tel:+79991234567">+7 (999) 123-45-67</a>'
+        var myPlacemark = new ymaps.Placemark([55.771899, 37.620393], {
+            balloonContent: '<strong>Golden Models</strong><br>Москва, м. Цветной Бульвар<br>ул. Цветной Бульвар, д.19 строение 5, 4 этаж<br><a href="tel:+79057173012">+7 905 717 30 12</a>'
         }, {
             preset: 'islands#icon',
             iconColor: '#0d6efd'

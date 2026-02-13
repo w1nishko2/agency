@@ -505,16 +505,15 @@ class CastingAdminController extends Controller
         }
         
         Log::info('Models assigned to casting', [
-            'casting_id' => $application->id,
-            'total_models' => count($modelIds),
-            'emails_sent' => $emailSentCount,
-            'telegrams_sent' => $telegramSentCount,
-            'selected_model_ids' => $modelIds
-        ]);
             'application_id' => $application->id,
+            'casting_id' => $application->id,
             'models_count' => count($modelIds),
+            'total_models' => count($modelIds),
             'model_ids' => $modelIds,
+            'selected_model_ids' => $modelIds,
+            'emails_sent' => $emailSentCount,
             'emails_queued' => $emailSentCount,
+            'telegrams_sent' => $telegramSentCount,
             'telegram_sent' => $telegramSentCount,
             'admin_id' => auth()->id(),
             'admin_name' => auth()->user()->name
