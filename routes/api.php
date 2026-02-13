@@ -19,5 +19,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// CSRF Token Refresh - для предотвращения ошибки 419
+Route::get('/csrf-token', function () {
+    return response()->json([
+        'token' => csrf_token(),
+        'timestamp' => time()
+    ]);
+});
+
 // Telegram Bot Webhook
 Route::post('/telegram/webhook', [TelegramWebhookController::class, 'handle']);

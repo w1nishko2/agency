@@ -1,6 +1,12 @@
 import 'bootstrap';
 
 /**
+ * CSRF Token Manager - автоматическое обновление токена
+ * Предотвращает ошибку 419 для пользователей, которые долго держат вкладку открытой
+ */
+import './csrf-token-manager';
+
+/**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
  * CSRF token as a header based on the value of the "XSRF" token cookie.
